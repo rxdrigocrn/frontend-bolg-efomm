@@ -10,7 +10,8 @@ import {
   Search,
   Newspaper,
   User,
-  Tags
+  Tags,
+  Info
 } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { ReactNode } from "react";
@@ -94,6 +95,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 label="Tags"
                 active={pathname.includes("/tags")}
                 onClick={() => router.push("/dashboard/tags")}
+              />
+              <SidebarItem
+                icon={<Info size={18} strokeWidth={2.5} />}
+                label="Sobre"
+                active={pathname.includes("/sobre")}
+                onClick={() => router.push("/dashboard/sobre")}
               />
             </>
           )}

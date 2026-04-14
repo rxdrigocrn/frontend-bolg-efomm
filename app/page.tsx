@@ -1,6 +1,17 @@
+"use client";
+
 import Image from "next/image";
+import { useEffect } from "react";
 import { HamburgerMenu } from "@/components/HamburguerMenu";
+import { useManagementStore } from "@/store/managementStore";
+
 export default function Home() {
+  const { members, loading, fetchMembers } = useManagementStore();
+
+  useEffect(() => {
+    void fetchMembers();
+  }, [fetchMembers]);
+
   return (
     <div>
 
@@ -76,64 +87,41 @@ export default function Home() {
         <div className="container">
           <h2>Nossa Gerência</h2>
 
-          <div className="equipe-grid">
-            {[
-              {
-                nome: "Al. Marcio Rodriguez Filho",
-                cargo: "Presidente do Jornal Canal 16",
-                info: "3º ano de Náutica",
-                img: "/img/marcinho.jpeg",
-              },
-              {
-                nome: "Al. Kamilla Rutowitcz",
-                cargo: "Vice-Presidente",
-                info: "3º ano de Náutica",
-                img: "/img/kamila.png",
-              },
-              {
-                nome: "Al. Josué Pedrosa",
-                cargo: "Desenvolvedor do Site",
-                info: "3º ano de Máquinas",
-                img: "/img/josuepedrosa.jpeg",
-              },
-              {
-                nome: "Al. Silveira",
-                cargo: "Enc. de Mídias",
-                info: "2º ano de Náutica",
-                img: "/img/silveira.png",
-              },
-              {
-                nome: "Al. Ayra Poderoso",
-                cargo: "Enc. de Redação",
-                info: "3º ano de Máquinas",
-                img: "/img/danuza.jpeg",
-              },
-              {
-                nome: "Al. Luiz Barbosa",
-                cargo: "Fotografia e Cinegrafia",
-                info: "3º ano de Máquinas",
-                img: "/img/luizbarbosa.jpeg",
-              },
-            ].map((membro, i) => (
-              <div key={i} className="equipe-member">
-                
-                <div className="member-photo">
-                  <Image
-                    src={membro.img}
-                    alt={membro.nome}
-                    width={200}
-                    height={200}
-                  />
+          {loading && members.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-slate-200 bg-white/70 py-12 text-center text-slate-500">
+              Carregando gerência...
+            </div>
+          ) : members.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-slate-200 bg-white/70 py-12 text-center text-slate-500">
+              Nenhum membro da gerência foi cadastrado ainda.
+            </div>
+          ) : (
+            <div className="equipe-grid">
+              {members.map((membro) => (
+                <div key={membro.id} className="equipe-member">
+                  <div className="member-photo">
+                    {membro.photoUrl ? (
+                      <img
+                        src={membro.photoUrl}
+                        alt={membro.nome}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="h-full w-full flex items-center justify-center bg-slate-100 text-3xl font-bold text-slate-400">
+                        {membro.nome?.charAt(0)?.toUpperCase() || "M"}
+                      </div>
+                    )}
+                  </div>
+
+                  <h3>{membro.nome}</h3>
+                  <p className="member-cargo">{membro.cargo}</p>
+                  <p className="member-info">{membro.descricao}</p>
+
+                  <div className="member-line"></div>
                 </div>
-
-                <h3>{membro.nome}</h3>
-                <p className="member-cargo">{membro.cargo}</p>
-                <p className="member-info">{membro.info}</p>
-
-                <div className="member-line"></div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
