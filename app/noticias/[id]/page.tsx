@@ -1,0 +1,319 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
+import { 
+  ArrowLeft, 
+  CalendarDays, 
+  Newspaper, 
+  Clock, 
+  Link as LinkIcon, 
+  MessageCircle, // Para substituir o Facebook (como um fórum/comunidade)
+  Send           // Para substituir o Twitter (como um envio/tweet)
+} from "lucide-react";
+import { HamburgerMenu } from "@/components/HamburguerMenu";
+import { apiFetch } from "@/services/api";
+
+type PostDetail = {
+  id: string;
+  titulo: string;
+  slug: string;
+  conteudo: string;
+  imagemUrl: string;
+  publicado: boolean;
+  autorId: string;
+  autor?: {
+    id: string;
+    nome: string;
+    avatarUrl: string;
+    bio?: string;
+    tags?: string[];
+  };
+  createdAt: string;
+};
+
+export default function NoticiaDetalhePage() {
+  const router = useRouter();
+  const params = useParams();
+
+  const postId = useMemo(() => {
+    const value = params?.id;
+    if (Array.isArray(value)) {
+      return value[0] || "";
+    }
+    return typeof value === "string" ? value : "";
+  }, [params]);
+
+  const [post, setPost] = useState<PostDetail | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const authorProfileId = post?.autor?.id || post?.autorId || "";
+  const authorProfileHref = authorProfileId ? `/perfil/${authorProfileId}` : null;
+
+  useEffect(() => {
+    if (!postId) {
+      return;
+    }
+
+    let active = true;
+
+    const fetchPost = async () => {
+      setLoading(true);
+      setError(null);
+
+      const endpoints = [
+        `/posts/public/${postId}`,
+        `/posts/${postId}`,
+      ];
+
+      for (const endpoint of endpoints) {
+        try {
+          const response = await apiFetch(endpoint);
+          const payload = response?.data ?? response;
+
+          if (payload?.id) {
+            if (active) {
+              setPost(payload as PostDetail);
+              setLoading(false);
+            }
+            return;
+          }
+        } catch {
+          // Tenta o próximo endpoint se der 404/403
+        }
+      }
+
+      if (active) {
+        setError("Não foi possível carregar a reportagem.");
+        setLoading(false);
+      }
+    };
+
+    void fetchPost();
+
+    return () => {
+      active = false;
+    };
+  }, [postId]);
+
+  // Função para formatar a data
+  const formatarData = (dataString: string) => {
+    if (!dataString) return "Data não informada";
+    const data = new Date(dataString);
+    if (Number.isNaN(data.getTime())) return "Data inválida";
+    
+    return new Intl.DateTimeFormat("pt-BR", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    }).format(data);
+  };
+
+  const calcularTempoLeitura = (texto: string) => {
+    if (!texto) return 1;
+    const palavras = texto.trim().split(/\s+/).length;
+    return Math.ceil(palavras / 200);
+  };
+
+  const formatarConteudo = (texto: string) => {
+    return texto.split('\n').map((paragrafo, index) => {
+      if (paragrafo.trim() === '') return <br key={index} />;
+      return (
+        <p key={index} className="mb-6">
+          {paragrafo}
+        </p>
+      );
+    });
+  };
+
+  return (
+    <div className="bg-white min-h-screen font-sans text-slate-900 selection:bg-blue-100 selection:text-blue-900">
+      <HamburgerMenu />
+
+      {/* HEADER MINIMALISTA */}
+      <header className="sticky top-0 z-40 w-full border-b border-slate-100 bg-white/80 backdrop-blur-md">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 flex h-16 items-center justify-between">
+          <Link href="/noticias" className="flex items-center gap-2 group">
+            <div className="bg-blue-900 p-1.5 rounded-lg transition-transform group-hover:scale-110">
+              <Newspaper className="text-white w-5 h-5" />
+            </div>
+            <span className="text-xl font-bold tracking-tighter text-blue-900">
+              Canal 16
+            </span>
+          </Link>
+
+          <button
+            onClick={() => router.push("/noticias")}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-slate-500 font-medium text-sm hover:bg-slate-50 hover:text-blue-900 transition-all"
+          >
+            <ArrowLeft size={16} /> <span className="hidden sm:inline">Voltar para notícias</span>
+          </button>
+        </div>
+      </header>
+
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
+        {loading ? (
+          <div className="py-20 text-center">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-900 mx-auto mb-4" />
+            <p className="text-slate-500 font-medium">Carregando reportagem...</p>
+          </div>
+        ) : !postId || error || !post ? (
+          <div className="py-20 text-center">
+            <h1 className="text-2xl font-bold text-slate-900 mb-2">Ops! Reportagem não encontrada.</h1>
+            <p className="text-slate-500 mb-8">{!postId ? "Notícia inválida." : error || "Essa página pode ter sido movida ou excluída."}</p>
+            <button
+              onClick={() => router.push("/noticias")}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-900 text-white rounded-full hover:bg-blue-800 transition-colors font-medium shadow-sm"
+            >
+              <ArrowLeft size={18} /> Voltar para o Início
+            </button>
+          </div>
+        ) : (
+          <article className="animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
+            
+            {/* CABEÇALHO DO ARTIGO (TÍTULO E AUTOR) */}
+            <header className="mb-10 text-center max-w-3xl mx-auto">
+              <span className="text-blue-600 font-bold tracking-widest text-xs uppercase mb-4 block">
+                Informativo Oficial
+              </span>
+              
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-slate-900 leading-[1.1] mb-8">
+                {post.titulo}
+              </h1>
+
+              {/* BYLINE (Autor e Data) */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 text-slate-600 pt-6 border-t border-slate-100">
+                {authorProfileHref ? (
+                  <Link href={authorProfileHref} className="group flex items-center gap-3 rounded-xl px-2 py-1 transition-colors hover:bg-slate-50">
+                    <div className="h-12 w-12 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-blue-900 font-bold text-lg overflow-hidden shadow-sm">
+                      {post.autor?.avatarUrl ? (
+                        <img src={post.autor.avatarUrl} alt={post.autor?.nome || "Autor"} className="h-full w-full object-cover" />
+                      ) : (
+                        post.autor?.nome?.charAt(0) || "R"
+                      )}
+                    </div>
+                    <div className="text-left">
+                      <p className="text-base font-bold text-slate-900 transition-colors group-hover:text-blue-700">
+                        {post.autor?.nome || "Redação Canal 16"}
+                      </p>
+                      <p className="text-xs font-medium text-blue-600">Equipe Editorial</p>
+                    </div>
+                  </Link>
+                ) : (
+                  <div className="flex items-center gap-3">
+                    <div className="h-12 w-12 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-blue-900 font-bold text-lg overflow-hidden shadow-sm">
+                      {post.autor?.avatarUrl ? (
+                        <img src={post.autor.avatarUrl} alt={post.autor?.nome || "Autor"} className="h-full w-full object-cover" />
+                      ) : (
+                        post.autor?.nome?.charAt(0) || "R"
+                      )}
+                    </div>
+                    <div className="text-left">
+                      <p className="text-base font-bold text-slate-900">
+                        {post.autor?.nome || "Redação Canal 16"}
+                      </p>
+                      <p className="text-xs font-medium text-blue-600">Equipe Editorial</p>
+                    </div>
+                  </div>
+                )}
+
+                <div className="hidden sm:block h-8 w-px bg-slate-200" />
+
+                <div className="flex items-center gap-4 text-sm font-medium">
+                  <div className="flex items-center gap-1.5">
+                    <CalendarDays size={16} className="text-slate-400" />
+                    {formatarData(post.createdAt)}
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Clock size={16} className="text-slate-400" />
+                    {calcularTempoLeitura(post.conteudo)} min de leitura
+                  </div>
+                </div>
+              </div>
+            </header>
+
+            {/* IMAGEM DE CAPA */}
+            <div className="w-full mb-12">
+              <div className="relative aspect-[16/9] w-full rounded-2xl overflow-hidden bg-slate-100 shadow-md border border-slate-100">
+                {post.imagemUrl ? (
+                  <img
+                    src={post.imagemUrl}
+                    alt={post.titulo}
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-7xl bg-blue-900/5">
+                    🚢
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* CORPO DO TEXTO */}
+            <div className="max-w-3xl mx-auto">
+              <div className="text-lg md:text-[20px] leading-relaxed md:leading-[1.8] text-slate-700 font-serif">
+                {formatarConteudo(post.conteudo)}
+              </div>
+
+              {/* TAGS E COMPARTILHAMENTO (RODAPÉ DO ARTIGO) */}
+              <div className="mt-16 pt-8 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-6">
+                <div className="flex gap-2">
+                  {post.autor?.tags?.map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium uppercase tracking-wider"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-semibold text-slate-500 mr-2">Compartilhar:</span>
+                  <button className="h-10 w-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-600 hover:text-blue-600 hover:border-blue-600 transition-colors" title="Copiar Link">
+                    <LinkIcon size={18} />
+                  </button>
+                  <button className="h-10 w-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-600 hover:text-blue-400 hover:border-blue-400 transition-colors" title="Twitter">
+                    <Send size={18} />
+                  </button>
+                  <button className="h-10 w-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-600 hover:text-blue-800 hover:border-blue-800 transition-colors" title="Facebook">
+                    <MessageCircle size={18} />
+                  </button>
+                </div>
+              </div>
+
+              {/* CARD DO AUTOR DETALHADO */}
+              <div className="mt-12 bg-slate-50 rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-center sm:items-start gap-6 border border-slate-100">
+                <div className="h-20 w-20 flex-shrink-0 rounded-full bg-white border-2 border-white shadow-sm flex items-center justify-center text-blue-900 font-bold text-3xl overflow-hidden ring-1 ring-slate-200">
+                  {post.autor?.avatarUrl ? (
+                    <img src={post.autor.avatarUrl} alt={post.autor?.nome} className="h-full w-full object-cover" />
+                  ) : (
+                    post.autor?.nome?.charAt(0) || "R"
+                  )}
+                </div>
+                <div className="text-center sm:text-left">
+                  <h3 className="text-lg font-bold text-slate-900">
+                    Escrito por{" "}
+                    {authorProfileHref ? (
+                      <Link href={authorProfileHref} className="text-blue-800 hover:text-blue-700 transition-colors">
+                        {post.autor?.nome || "Redação"}
+                      </Link>
+                    ) : (
+                      post.autor?.nome || "Redação"
+                    )}
+                  </h3>
+                  <p className="text-slate-600 mt-2 text-sm leading-relaxed">
+                    {post.autor?.bio || "Descrição do autor"}
+                    </p>
+                </div>
+              </div>
+
+            </div>
+          </article>
+        )}
+      </main>
+    </div>
+  );
+}

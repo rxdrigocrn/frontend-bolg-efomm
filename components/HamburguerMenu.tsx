@@ -50,8 +50,7 @@ export function HamburgerMenu() {
       <button
         onClick={() => setOpen(!open)}
         aria-label="Abrir Menu"
-        className="fixed top-8 right-8 z-[60] w-14 h-14 flex flex-col justify-center items-center gap-1.5 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-2xl transition-all duration-300 border border-white/20 group"
-      >
+        className="fixed top-8 right-8 z-[60] w-14 h-14 flex flex-col justify-center items-center gap-1.5 bg-gradient-to-r from-blue-950 to-blue-800 hover:bg-white/20 backdrop-blur-md rounded-2xl transition-all duration-300 border  border-white/20 group cursor-pointer">
         <motion.span
           animate={open ? { rotate: 45, y: 8 } : { rotate: 0, y: 0 }}
           className="w-7 h-[2px] bg-white rounded-full"
