@@ -8,7 +8,7 @@ import {
   type UpdateManagementInput,
   useManagementStore,
 } from "@/store/managementStore";
-import { Loader2, Pencil, Plus, Save, Trash2, Upload, X, Users } from "lucide-react";
+import { AlertTriangle, Loader2, Pencil, Plus, Save, Trash2, Upload, X, Users } from "lucide-react";
 
 type MemberModalProps = {
   member?: ManagementMember | null;
@@ -22,6 +22,7 @@ export default function DashboardSobrePage() {
   const { user } = useAuthStore();
   const { members, loading, fetchMembers, createMember, updateMember, deleteMember } = useManagementStore();
   const [modalMember, setModalMember] = useState<ManagementMember | null | undefined>(undefined);
+  const [memberToDelete, setMemberToDelete] = useState<ManagementMember | null>(null);
 
   useEffect(() => {
     void fetchMembers();
@@ -37,6 +38,14 @@ export default function DashboardSobrePage() {
       </div>
     );
   }
+
+  const handleConfirmDelete = async () => {
+    if (!memberToDelete) return;
+
+    await deleteMember(memberToDelete.id);
+    setMemberToDelete(null);
+    void fetchMembers();
+  };
 
   return (
     <div className="space-y-6 fade-in">
@@ -97,9 +106,6 @@ export default function DashboardSobrePage() {
                       <h3 className="text-lg font-bold text-slate-900">{member.nome}</h3>
                       <p className="text-sm text-blue-700 font-medium">{member.cargo}</p>
                     </div>
-                    <span className="text-xs font-semibold text-slate-500 bg-slate-100 px-2 py-1 rounded-md">
-                      Ordem {member.order}
-                    </span>
                   </div>
                   <p className="text-sm text-slate-500 mt-1">{member.descricao}</p>
                 </div>
@@ -113,7 +119,7 @@ export default function DashboardSobrePage() {
                     Editar
                   </button>
                   <button
-                    onClick={() => void deleteMember(member.id)}
+                    onClick={() => setMemberToDelete(member)}
                     className="inline-flex items-center justify-center p-2.5 rounded-xl border border-slate-200 text-slate-500 hover:bg-red-50 hover:text-red-600 transition-colors"
                     title="Remover"
                   >
@@ -138,6 +144,40 @@ export default function DashboardSobrePage() {
           updateMember={updateMember}
         />
       )}
+
+      {memberToDelete && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white w-full max-w-sm rounded-2xl p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex items-center gap-3 text-red-600 mb-4">
+              <div className="bg-red-100 p-2 rounded-full">
+                <AlertTriangle size={24} />
+              </div>
+              <h2 className="text-lg font-bold text-slate-900">Confirmar exclusão</h2>
+            </div>
+
+            <p className="text-sm text-slate-600 mb-6">
+              Tem certeza que deseja remover o membro {memberToDelete.nome}? Esta ação não pode ser desfeita.
+            </p>
+
+            <div className="flex gap-3 justify-end">
+              <button
+                type="button"
+                onClick={() => setMemberToDelete(null)}
+                className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-xl transition"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={() => void handleConfirmDelete()}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-xl transition-colors shadow-sm"
+              >
+                Sim, Excluir
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -152,6 +192,8 @@ function MemberModal({ member, onClose, onSuccess, createMember, updateMember }:
     descricao: "",
     photoUrl: "",
     order: 0,
+    isManagement: false,
+    isSobre: false,
   });
 
   useEffect(() => {
@@ -161,6 +203,8 @@ function MemberModal({ member, onClose, onSuccess, createMember, updateMember }:
       descricao: member?.descricao || "",
       photoUrl: member?.photoUrl || "",
       order: member?.order ?? 0,
+      isManagement: member?.isManagement ?? false,
+      isSobre: member?.isSobre ?? false,
     });
     setFile(null);
   }, [member]);
@@ -177,6 +221,8 @@ function MemberModal({ member, onClose, onSuccess, createMember, updateMember }:
         descricao: form.descricao,
         photoUrl: form.photoUrl,
         order: form.order,
+        isManagement: form.isManagement,
+        isSobre: form.isSobre,
         file,
       };
 
@@ -260,6 +306,32 @@ function MemberModal({ member, onClose, onSuccess, createMember, updateMember }:
                 onChange={(event) => setForm({ ...form, photoUrl: event.target.value })}
                 className="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <label className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={form.isManagement}
+                  onChange={(event) =>
+                    setForm({ ...form, isManagement: event.target.checked })
+                  }
+                  className="h-4 w-4 rounded border-slate-300 text-blue-900 focus:ring-blue-500/20"
+                />
+                Exibir na gestão 
+              </label>
+
+              <label className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={form.isSobre}
+                  onChange={(event) =>
+                    setForm({ ...form, isSobre: event.target.checked })
+                  }
+                  className="h-4 w-4 rounded border-slate-300 text-blue-900 focus:ring-blue-500/20"
+                />
+                Exibir no Sobre
+              </label>
             </div>
 
             <div className="space-y-1">

@@ -1266,3 +1266,17 @@
             height: 180px;
         }
     }
+
+    @keyframes wave {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-wave {
+  animation: wave 15s linear infinite;
+  width: 200%; /* Dobramos a largura para a repetição ser fluida */
+}

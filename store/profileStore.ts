@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { apiFetch } from "@/services/api";
+import { toast } from "react-toastify";
 
 type Profile = {
   id: string;
@@ -74,10 +75,14 @@ export const useProfileStore = create<ProfileState>((set) => ({
     set({ loading: true, error: null, posts: [] });
 
     try {
-      const profileResponse = await apiFetch(`/users/${profileId}`);
+      const profileResponse = await apiFetch(`/users/${profileId}`, {
+        showErrorToast: false,
+      });
       const profilePayload = normalizeProfilePayload(profileResponse);
 
-      const response = await apiFetch(`/posts/public?page=1&limit=100`);
+      const response = await apiFetch(`/posts/public?page=1&limit=100`, {
+        showErrorToast: false,
+      });
       const availablePosts = normalizePostsPayload(response);
       const filteredPosts = filterPostsByAuthor(availablePosts, profileId);
 
@@ -100,7 +105,9 @@ export const useProfileStore = create<ProfileState>((set) => ({
       });
     } catch {
       try {
-        const response = await apiFetch(`/posts/public?page=1&limit=100`);
+        const response = await apiFetch(`/posts/public?page=1&limit=100`, {
+          showErrorToast: false,
+        });
         const availablePosts = normalizePostsPayload(response);
         const filteredPosts = filterPostsByAuthor(availablePosts, profileId);
 
@@ -123,6 +130,15 @@ export const useProfileStore = create<ProfileState>((set) => ({
         // no-op
       }
 
+      toast.error("Nao foi possivel carregar o perfil do autor.", {
+        position: "top-right",
+        autoClose: 4500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "light",
+      });
       set({
         profile: null,
         posts: [],

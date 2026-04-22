@@ -8,6 +8,8 @@ export type ManagementMember = {
   descricao: string;
   photoUrl: string;
   order: number;
+  isManagement: boolean;
+  isSobre: boolean;
 };
 
 export type CreateManagementInput = {
@@ -16,6 +18,8 @@ export type CreateManagementInput = {
   descricao: string;
   photoUrl?: string;
   order?: number;
+  isManagement?: boolean;
+  isSobre?: boolean;
   file?: File | null;
 };
 
@@ -25,6 +29,8 @@ export type UpdateManagementInput = {
   descricao?: string;
   photoUrl?: string;
   order?: number;
+  isManagement?: boolean;
+  isSobre?: boolean;
   file?: File | null;
 };
 
@@ -55,6 +61,8 @@ const buildFormData = (data: CreateManagementInput | UpdateManagementInput) => {
   if (data.descricao !== undefined) formData.append("descricao", data.descricao);
   if (data.photoUrl !== undefined) formData.append("photoUrl", data.photoUrl);
   if (data.order !== undefined) formData.append("order", String(data.order));
+  if (data.isManagement !== undefined) formData.append("isManagement", String(data.isManagement));
+  if (data.isSobre !== undefined) formData.append("isSobre", String(data.isSobre));
   if (data.file) formData.append("file", data.file);
 
   return formData;

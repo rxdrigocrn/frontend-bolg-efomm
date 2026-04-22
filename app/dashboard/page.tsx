@@ -43,7 +43,7 @@ export default function DashboardHome() {
           title="Total de Publicações" 
           value={total} 
           icon={<FileText size={20} />} 
-          trend="+3"
+          trend=""
           trendLabel="esta semana"
           color="blue"
         />

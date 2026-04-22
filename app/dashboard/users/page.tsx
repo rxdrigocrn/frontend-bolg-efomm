@@ -11,6 +11,7 @@ import {
 } from "@/store/userStore";
 import {
   Mail,
+  AlertTriangle,
   Pencil,
   Plus,
   Save,
@@ -35,6 +36,7 @@ export default function UsersPage() {
   const { tags, fetchTags } = useTagStore();
   const { users, fetchUsers, deleteUser, createUser, updateUser } = useUserStore();
   const [modalUser, setModalUser] = useState<User | null | undefined>(undefined);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
   useEffect(() => {
     void fetchUsers();
@@ -42,6 +44,14 @@ export default function UsersPage() {
   }, [fetchTags, fetchUsers]);
 
   const canManageUsers = user?.role === "PRESIDENTE";
+
+  const handleConfirmDelete = async () => {
+    if (!userToDelete) return;
+
+    await deleteUser(userToDelete.id);
+    setUserToDelete(null);
+    void fetchUsers();
+  };
 
   return (
     <div className="space-y-6 fade-in">
@@ -129,7 +139,7 @@ export default function UsersPage() {
                     )}
                     {canManageUsers && (
                       <button
-                        onClick={() => void deleteUser(u.id)}
+                        onClick={() => setUserToDelete(u)}
                         className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                         title="Remover usuário"
                       >
@@ -156,6 +166,40 @@ export default function UsersPage() {
           createUser={createUser}
           updateUser={updateUser}
         />
+      )}
+
+      {userToDelete && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white w-full max-w-sm rounded-2xl p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex items-center gap-3 text-red-600 mb-4">
+              <div className="bg-red-100 p-2 rounded-full">
+                <AlertTriangle size={24} />
+              </div>
+              <h2 className="text-lg font-bold text-slate-900">Confirmar exclusão</h2>
+            </div>
+
+            <p className="text-sm text-slate-600 mb-6">
+              Tem certeza que deseja remover o usuário {userToDelete.nome}? Esta ação não pode ser desfeita.
+            </p>
+
+            <div className="flex gap-3 justify-end">
+              <button
+                type="button"
+                onClick={() => setUserToDelete(null)}
+                className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-xl transition"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={() => void handleConfirmDelete()}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-xl transition-colors shadow-sm"
+              >
+                Sim, Excluir
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

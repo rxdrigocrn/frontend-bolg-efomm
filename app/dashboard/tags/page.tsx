@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { useTagStore } from "@/store/tagStore";
-import { Pencil, Plus, Save, Tags, Trash2, UserRound, X } from "lucide-react";
+import { AlertTriangle, Pencil, Plus, Save, Tags, Trash2, X } from "lucide-react";
 
 export default function TagsPage() {
   const { user } = useAuthStore();
@@ -13,6 +13,7 @@ export default function TagsPage() {
   const [creating, setCreating] = useState(false);
   const [editingTagId, setEditingTagId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState("");
+  const [tagToDelete, setTagToDelete] = useState<{ id: string; name: string } | null>(null);
 
   useEffect(() => {
     void fetchTags();
@@ -50,6 +51,13 @@ export default function TagsPage() {
     await updateTag(tagId, name);
     setEditingTagId(null);
     setEditingName("");
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!tagToDelete) return;
+
+    await deleteTag(tagToDelete.id);
+    setTagToDelete(null);
   };
 
   return (
@@ -139,7 +147,7 @@ export default function TagsPage() {
                           <Pencil size={16} />
                         </button>
                         <button
-                          onClick={() => void deleteTag(tag.id)}
+                          onClick={() => setTagToDelete({ id: tag.id, name: tag.name })}
                           className="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg"
                           title="Excluir"
                         >
@@ -154,6 +162,40 @@ export default function TagsPage() {
           </div>
         </section>
       </div>
+
+      {tagToDelete && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white w-full max-w-sm rounded-2xl p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex items-center gap-3 text-red-600 mb-4">
+              <div className="bg-red-100 p-2 rounded-full">
+                <AlertTriangle size={24} />
+              </div>
+              <h2 className="text-lg font-bold text-slate-900">Confirmar exclusão</h2>
+            </div>
+
+            <p className="text-sm text-slate-600 mb-6">
+              Tem certeza que deseja excluir a tag {tagToDelete.name}? Esta ação não pode ser desfeita.
+            </p>
+
+            <div className="flex gap-3 justify-end">
+              <button
+                type="button"
+                onClick={() => setTagToDelete(null)}
+                className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-xl transition"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={() => void handleConfirmDelete()}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-xl transition-colors shadow-sm"
+              >
+                Sim, Excluir
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

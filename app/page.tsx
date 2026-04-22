@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect } from "react";
 import { HamburgerMenu } from "@/components/HamburguerMenu";
 import { useManagementStore } from "@/store/managementStore";
+import Footer from "@/components/Footer";
 
 export default function Home() {
   const { members, loading, fetchMembers } = useManagementStore();
@@ -14,15 +15,13 @@ export default function Home() {
 
   return (
     <div>
-
-
       {/* HERO */}
       <section className="hero">
         <div className="hero-background">
           <div className="hero-bg-image"></div>
           <div className="hero-overlay"></div>
         </div>
-<HamburgerMenu />
+        <HamburgerMenu />
         <div className="hero-content">
           <Image
             src="/img/logo.jpg"
@@ -65,13 +64,13 @@ export default function Home() {
               </p>
 
               <p>
-                Nosso foco é apresentar informações sobre a profissão,
-                rotina e adaptação dos alunos, além de cobrir eventos.
+                Nosso foco é apresentar informações sobre a profissão, rotina e
+                adaptação dos alunos, além de cobrir eventos.
               </p>
 
               <p>
-                Somos um espaço de expressão, informação e conexão entre
-                alunos, famílias e a comunidade marítima.
+                Somos um espaço de expressão, informação e conexão entre alunos,
+                famílias e a comunidade marítima.
               </p>
 
               <div className="decorative-line">
@@ -134,7 +133,6 @@ export default function Home() {
           </p>
 
           <div className="contato-grid">
-            
             <div className="contato-card">
               <div className="contato-icon-wrapper">
                 <span className="contato-icon">📍</span>
@@ -181,51 +179,12 @@ export default function Home() {
                 />
               </div>
             </div>
-
           </div>
         </div>
       </section>
 
       {/* FOOTER */}
-      <footer className="footer">
-        <div className="container">
-          <div className="footer-content">
-            
-            <div className="footer-section">
-              <h4>Jornal Canal 16</h4>
-              <p>
-                Portal de notícias e informações dos alunos da EFOMM em Belém, Pará.
-              </p>
-            </div>
-
-            <div className="footer-section">
-              <h4>Links Rápidos</h4>
-              <ul>
-                <li><a href="#">Portal de Notícias</a></li>
-                <li><a href="#">Sobre</a></li>
-                <li><a href="#">Contato</a></li>
-                <li><a href="#">Equipe</a></li>
-              </ul>
-            </div>
-
-            <div className="footer-section">
-              <h4>Redes Sociais</h4>
-              <div className="footer-social">
-                <a href="https://instagram.com/jornalcanal16">IG</a>
-                <a href="https://youtube.com/@JornalCanal.16">YT</a>
-                <a href="https://facebook.com/JornalCanal16">FB</a>
-              </div>
-            </div>
-
-          </div>
-
-          <div className="footer-bottom">
-            <p>© 2026 Jornal Canal 16</p>
-            <p>EFOMM (CIABA) • Belém, Pará</p>
-          </div>
-        </div>
-      </footer>
-
+      <Footer />
     </div>
   );
 }

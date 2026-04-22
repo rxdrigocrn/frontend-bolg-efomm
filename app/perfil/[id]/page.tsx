@@ -3,7 +3,13 @@
 import { useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, CalendarDays, FileText, Tags, UserRound } from "lucide-react";
+import {
+  ArrowLeft,
+  CalendarDays,
+  FileText,
+  Tags,
+  UserRound,
+} from "lucide-react";
 import { HamburgerMenu } from "@/components/HamburguerMenu";
 import { useProfileStore } from "@/store/profileStore";
 
@@ -19,7 +25,8 @@ export default function PerfilAutorPage() {
     return typeof value === "string" ? value : "";
   }, [params]);
 
-  const { profile, posts, loading, error, fetchProfileWithPosts } = useProfileStore();
+  const { profile, posts, loading, error, fetchProfileWithPosts } =
+    useProfileStore();
 
   useEffect(() => {
     void fetchProfileWithPosts(profileId);
@@ -45,8 +52,11 @@ export default function PerfilAutorPage() {
 
       <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-          <Link href="/noticias" className="text-xl font-bold tracking-tight text-blue-900">
-            Canal 16
+          <Link href="/noticias">
+            <img
+              src="/img/logo.jpg"
+              className="w-12 h-12 object-cover rounded-lg"
+            />
           </Link>
 
           <button
@@ -67,7 +77,9 @@ export default function PerfilAutorPage() {
         ) : error || !profile ? (
           <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
             <h1 className="mb-3 text-2xl font-bold">Perfil nao encontrado</h1>
-            <p className="mb-6 text-slate-600">{error || "Nao foi possivel carregar este autor."}</p>
+            <p className="mb-6 text-slate-600">
+              {error || "Nao foi possivel carregar este autor."}
+            </p>
             <Link
               href="/noticias"
               className="inline-flex items-center gap-2 rounded-full bg-blue-900 px-5 py-2.5 font-medium text-white transition-colors hover:bg-blue-800"
@@ -81,20 +93,29 @@ export default function PerfilAutorPage() {
               <div className="flex flex-col items-center gap-5 text-center sm:flex-row sm:items-start sm:text-left">
                 <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-slate-100 text-3xl font-bold text-blue-900 ring-1 ring-slate-200">
                   {profile.avatarUrl ? (
-                    <img src={profile.avatarUrl} alt={profile.nome} className="h-full w-full object-cover" />
+                    <img
+                      src={profile.avatarUrl}
+                      alt={profile.nome}
+                      className="h-full w-full object-cover"
+                    />
                   ) : (
                     profile.nome?.charAt(0) || <UserRound size={28} />
                   )}
                 </div>
 
                 <div className="flex-1">
-                  <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">{profile.nome}</h1>
+                  <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
+                    {profile.nome}
+                  </h1>
                   <p className="mt-2 max-w-2xl text-slate-600">
-                    {profile.bio?.trim() || "Sem bio cadastrada para este autor."}
+                    {profile.bio?.trim() ||
+                      "Sem bio cadastrada para este autor."}
                   </p>
                   <div className="mt-3 flex flex-wrap items-center gap-2">
                     {(profile.tags || []).length === 0 ? (
-                      <span className="text-xs text-slate-500">Sem tags vinculadas.</span>
+                      <span className="text-xs text-slate-500">
+                        Sem tags vinculadas.
+                      </span>
                     ) : (
                       <>
                         <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-slate-400">
@@ -119,7 +140,9 @@ export default function PerfilAutorPage() {
             </section>
 
             <section>
-              <h2 className="mb-5 text-xl font-bold text-slate-900">Publicacoes do autor</h2>
+              <h2 className="mb-5 text-xl font-bold text-slate-900">
+                Publicacoes do autor
+              </h2>
 
               {posts.length === 0 ? (
                 <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center text-slate-500">
@@ -141,7 +164,9 @@ export default function PerfilAutorPage() {
                             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                           />
                         ) : (
-                          <div className="flex h-full w-full items-center justify-center text-5xl">📰</div>
+                          <div className="flex h-full w-full items-center justify-center text-5xl">
+                            📰
+                          </div>
                         )}
                       </div>
 
@@ -149,9 +174,12 @@ export default function PerfilAutorPage() {
                         <h3 className="mb-3 line-clamp-2 text-lg font-bold text-slate-900 group-hover:text-blue-700">
                           {post.titulo}
                         </h3>
-                        <p className="mb-4 line-clamp-3 text-sm text-slate-600">{post.conteudo}</p>
+                        <p className="mb-4 line-clamp-3 text-sm text-slate-600">
+                          {post.conteudo}
+                        </p>
                         <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
-                          <CalendarDays size={14} /> {formatarData(post.createdAt)}
+                          <CalendarDays size={14} />{" "}
+                          {formatarData(post.createdAt)}
                         </div>
                       </div>
                     </article>

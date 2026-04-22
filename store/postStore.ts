@@ -8,6 +8,10 @@ type Post = {
   conteudo: string;
   imagemUrl: string;
   publicado: boolean;
+  tags?: Array<{
+    id: string;
+    name: string;
+  }>;
   autorId: string;
   autor: {
     id: string;
@@ -28,6 +32,7 @@ type CreatePostInput = {
   conteudo: string;
   imagemUrl?: string;
   publicado: boolean;
+  tags?: string[];
 };
 
 type PostState = {

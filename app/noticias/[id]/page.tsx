@@ -3,14 +3,14 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { 
-  ArrowLeft, 
-  CalendarDays, 
-  Newspaper, 
-  Clock, 
-  Link as LinkIcon, 
+import {
+  ArrowLeft,
+  CalendarDays,
+  Newspaper,
+  Clock,
+  Link as LinkIcon,
   MessageCircle, // Para substituir o Facebook (como um fórum/comunidade)
-  Send           // Para substituir o Twitter (como um envio/tweet)
+  Send, // Para substituir o Twitter (como um envio/tweet)
 } from "lucide-react";
 import { HamburgerMenu } from "@/components/HamburguerMenu";
 import { apiFetch } from "@/services/api";
@@ -22,13 +22,16 @@ type PostDetail = {
   conteudo: string;
   imagemUrl: string;
   publicado: boolean;
+  tags?: Array<{
+    id: string;
+    name: string;
+  }>;
   autorId: string;
   autor?: {
     id: string;
     nome: string;
     avatarUrl: string;
     bio?: string;
-    tags?: string[];
   };
   createdAt: string;
 };
@@ -50,7 +53,9 @@ export default function NoticiaDetalhePage() {
   const [error, setError] = useState<string | null>(null);
 
   const authorProfileId = post?.autor?.id || post?.autorId || "";
-  const authorProfileHref = authorProfileId ? `/perfil/${authorProfileId}` : null;
+  const authorProfileHref = authorProfileId
+    ? `/perfil/${authorProfileId}`
+    : null;
 
   useEffect(() => {
     if (!postId) {
@@ -63,10 +68,7 @@ export default function NoticiaDetalhePage() {
       setLoading(true);
       setError(null);
 
-      const endpoints = [
-        `/posts/public/${postId}`,
-        `/posts/${postId}`,
-      ];
+      const endpoints = [`/posts/public/${postId}`, `/posts/${postId}`];
 
       for (const endpoint of endpoints) {
         try {
@@ -103,7 +105,7 @@ export default function NoticiaDetalhePage() {
     if (!dataString) return "Data não informada";
     const data = new Date(dataString);
     if (Number.isNaN(data.getTime())) return "Data inválida";
-    
+
     return new Intl.DateTimeFormat("pt-BR", {
       day: "2-digit",
       month: "long",
@@ -118,8 +120,8 @@ export default function NoticiaDetalhePage() {
   };
 
   const formatarConteudo = (texto: string) => {
-    return texto.split('\n').map((paragrafo, index) => {
-      if (paragrafo.trim() === '') return <br key={index} />;
+    return texto.split("\n").map((paragrafo, index) => {
+      if (paragrafo.trim() === "") return <br key={index} />;
       return (
         <p key={index} className="mb-6">
           {paragrafo}
@@ -135,20 +137,19 @@ export default function NoticiaDetalhePage() {
       {/* HEADER MINIMALISTA */}
       <header className="sticky top-0 z-40 w-full border-b border-slate-100 bg-white/80 backdrop-blur-md">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 flex h-16 items-center justify-between">
-          <Link href="/noticias" className="flex items-center gap-2 group">
-            <div className="bg-blue-900 p-1.5 rounded-lg transition-transform group-hover:scale-110">
-              <Newspaper className="text-white w-5 h-5" />
-            </div>
-            <span className="text-xl font-bold tracking-tighter text-blue-900">
-              Canal 16
-            </span>
+          <Link href="/noticias">
+            <img
+              src="/img/logo.jpg"
+              className="w-12 h-12 object-cover rounded-lg"
+            />
           </Link>
 
           <button
             onClick={() => router.push("/noticias")}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-slate-500 font-medium text-sm hover:bg-slate-50 hover:text-blue-900 transition-all"
           >
-            <ArrowLeft size={16} /> <span className="hidden sm:inline">Voltar para notícias</span>
+            <ArrowLeft size={16} />{" "}
+            <span className="hidden sm:inline">Voltar para notícias</span>
           </button>
         </div>
       </header>
@@ -157,12 +158,20 @@ export default function NoticiaDetalhePage() {
         {loading ? (
           <div className="py-20 text-center">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-900 mx-auto mb-4" />
-            <p className="text-slate-500 font-medium">Carregando reportagem...</p>
+            <p className="text-slate-500 font-medium">
+              Carregando reportagem...
+            </p>
           </div>
         ) : !postId || error || !post ? (
           <div className="py-20 text-center">
-            <h1 className="text-2xl font-bold text-slate-900 mb-2">Ops! Reportagem não encontrada.</h1>
-            <p className="text-slate-500 mb-8">{!postId ? "Notícia inválida." : error || "Essa página pode ter sido movida ou excluída."}</p>
+            <h1 className="text-2xl font-bold text-slate-900 mb-2">
+              Ops! Reportagem não encontrada.
+            </h1>
+            <p className="text-slate-500 mb-8">
+              {!postId
+                ? "Notícia inválida."
+                : error || "Essa página pode ter sido movida ou excluída."}
+            </p>
             <button
               onClick={() => router.push("/noticias")}
               className="inline-flex items-center gap-2 px-6 py-3 bg-blue-900 text-white rounded-full hover:bg-blue-800 transition-colors font-medium shadow-sm"
@@ -172,13 +181,12 @@ export default function NoticiaDetalhePage() {
           </div>
         ) : (
           <article className="animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
-            
             {/* CABEÇALHO DO ARTIGO (TÍTULO E AUTOR) */}
             <header className="mb-10 text-center max-w-3xl mx-auto">
               <span className="text-blue-600 font-bold tracking-widest text-xs uppercase mb-4 block">
                 Informativo Oficial
               </span>
-              
+
               <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-slate-900 leading-[1.1] mb-8">
                 {post.titulo}
               </h1>
@@ -186,10 +194,17 @@ export default function NoticiaDetalhePage() {
               {/* BYLINE (Autor e Data) */}
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 text-slate-600 pt-6 border-t border-slate-100">
                 {authorProfileHref ? (
-                  <Link href={authorProfileHref} className="group flex items-center gap-3 rounded-xl px-2 py-1 transition-colors hover:bg-slate-50">
+                  <Link
+                    href={authorProfileHref}
+                    className="group flex items-center gap-3 rounded-xl px-2 py-1 transition-colors hover:bg-slate-50"
+                  >
                     <div className="h-12 w-12 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-blue-900 font-bold text-lg overflow-hidden shadow-sm">
                       {post.autor?.avatarUrl ? (
-                        <img src={post.autor.avatarUrl} alt={post.autor?.nome || "Autor"} className="h-full w-full object-cover" />
+                        <img
+                          src={post.autor.avatarUrl}
+                          alt={post.autor?.nome || "Autor"}
+                          className="h-full w-full object-cover"
+                        />
                       ) : (
                         post.autor?.nome?.charAt(0) || "R"
                       )}
@@ -198,14 +213,20 @@ export default function NoticiaDetalhePage() {
                       <p className="text-base font-bold text-slate-900 transition-colors group-hover:text-blue-700">
                         {post.autor?.nome || "Redação Canal 16"}
                       </p>
-                      <p className="text-xs font-medium text-blue-600">Equipe Editorial</p>
+                      <p className="text-xs font-medium text-blue-600">
+                        Equipe Editorial
+                      </p>
                     </div>
                   </Link>
                 ) : (
                   <div className="flex items-center gap-3">
                     <div className="h-12 w-12 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-blue-900 font-bold text-lg overflow-hidden shadow-sm">
                       {post.autor?.avatarUrl ? (
-                        <img src={post.autor.avatarUrl} alt={post.autor?.nome || "Autor"} className="h-full w-full object-cover" />
+                        <img
+                          src={post.autor.avatarUrl}
+                          alt={post.autor?.nome || "Autor"}
+                          className="h-full w-full object-cover"
+                        />
                       ) : (
                         post.autor?.nome?.charAt(0) || "R"
                       )}
@@ -214,7 +235,9 @@ export default function NoticiaDetalhePage() {
                       <p className="text-base font-bold text-slate-900">
                         {post.autor?.nome || "Redação Canal 16"}
                       </p>
-                      <p className="text-xs font-medium text-blue-600">Equipe Editorial</p>
+                      <p className="text-xs font-medium text-blue-600">
+                        Equipe Editorial
+                      </p>
                     </div>
                   </div>
                 )}
@@ -260,25 +283,42 @@ export default function NoticiaDetalhePage() {
               {/* TAGS E COMPARTILHAMENTO (RODAPÉ DO ARTIGO) */}
               <div className="mt-16 pt-8 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-6">
                 <div className="flex gap-2">
-                  {post.autor?.tags?.map((tag) => (
-                    <span
-                      key={tag}
-                      className="px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium uppercase tracking-wider"
-                    >
-                      {tag}
+                  {!post.tags || post.tags.length === 0 ? (
+                    <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-500 text-xs font-medium uppercase tracking-wider">
+                      Sem tags
                     </span>
-                  ))}
+                  ) : (
+                    post.tags.map((tag) => (
+                      <span
+                        key={tag.id}
+                        className="px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium uppercase tracking-wider"
+                      >
+                        {tag.name}
+                      </span>
+                    ))
+                  )}
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <span className="text-sm font-semibold text-slate-500 mr-2">Compartilhar:</span>
-                  <button className="h-10 w-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-600 hover:text-blue-600 hover:border-blue-600 transition-colors" title="Copiar Link">
+                  <span className="text-sm font-semibold text-slate-500 mr-2">
+                    Compartilhar:
+                  </span>
+                  <button
+                    className="h-10 w-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-600 hover:text-blue-600 hover:border-blue-600 transition-colors"
+                    title="Copiar Link"
+                  >
                     <LinkIcon size={18} />
                   </button>
-                  <button className="h-10 w-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-600 hover:text-blue-400 hover:border-blue-400 transition-colors" title="Twitter">
+                  <button
+                    className="h-10 w-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-600 hover:text-blue-400 hover:border-blue-400 transition-colors"
+                    title="Twitter"
+                  >
                     <Send size={18} />
                   </button>
-                  <button className="h-10 w-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-600 hover:text-blue-800 hover:border-blue-800 transition-colors" title="Facebook">
+                  <button
+                    className="h-10 w-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-600 hover:text-blue-800 hover:border-blue-800 transition-colors"
+                    title="Facebook"
+                  >
                     <MessageCircle size={18} />
                   </button>
                 </div>
@@ -288,7 +328,11 @@ export default function NoticiaDetalhePage() {
               <div className="mt-12 bg-slate-50 rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-center sm:items-start gap-6 border border-slate-100">
                 <div className="h-20 w-20 flex-shrink-0 rounded-full bg-white border-2 border-white shadow-sm flex items-center justify-center text-blue-900 font-bold text-3xl overflow-hidden ring-1 ring-slate-200">
                   {post.autor?.avatarUrl ? (
-                    <img src={post.autor.avatarUrl} alt={post.autor?.nome} className="h-full w-full object-cover" />
+                    <img
+                      src={post.autor.avatarUrl}
+                      alt={post.autor?.nome}
+                      className="h-full w-full object-cover"
+                    />
                   ) : (
                     post.autor?.nome?.charAt(0) || "R"
                   )}
@@ -297,7 +341,10 @@ export default function NoticiaDetalhePage() {
                   <h3 className="text-lg font-bold text-slate-900">
                     Escrito por{" "}
                     {authorProfileHref ? (
-                      <Link href={authorProfileHref} className="text-blue-800 hover:text-blue-700 transition-colors">
+                      <Link
+                        href={authorProfileHref}
+                        className="text-blue-800 hover:text-blue-700 transition-colors"
+                      >
                         {post.autor?.nome || "Redação"}
                       </Link>
                     ) : (
@@ -306,10 +353,9 @@ export default function NoticiaDetalhePage() {
                   </h3>
                   <p className="text-slate-600 mt-2 text-sm leading-relaxed">
                     {post.autor?.bio || "Descrição do autor"}
-                    </p>
+                  </p>
                 </div>
               </div>
-
             </div>
           </article>
         )}

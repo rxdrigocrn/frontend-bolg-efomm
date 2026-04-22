@@ -8,6 +8,7 @@ type User = {
   email: string;
   role: "PRESIDENTE" | "REDATOR";
   nome: string;
+  avatarUrl?: string;
 };
 
 type AuthState = {
