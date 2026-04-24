@@ -19,6 +19,7 @@ type AuthorPost = {
   slug?: string;
   conteudo: string;
   imagemUrl?: string;
+  imagemUrls?: string[];
   autorId: string;
   autor?: {
     id: string;

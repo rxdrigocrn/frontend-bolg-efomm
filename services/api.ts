@@ -1,4 +1,4 @@
-export const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://backend-blog-efomm.onrender.com";
+export const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
 import { useAuthStore } from "@/store/authStore";
 import { toast } from "react-toastify";

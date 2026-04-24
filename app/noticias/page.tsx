@@ -13,6 +13,14 @@ import {
 } from "lucide-react";
 import { usePostStore } from "@/store/postStore";
 
+const getCoverImage = (post: { imagemUrl?: string; imagemUrls?: string[] }) => {
+  const firstFromArray = Array.isArray(post.imagemUrls)
+    ? post.imagemUrls.find((url) => typeof url === "string" && url.trim())
+    : "";
+
+  return firstFromArray || post.imagemUrl || "";
+};
+
 export default function Noticias() {
   const router = useRouter();
 
@@ -118,9 +126,9 @@ export default function Noticias() {
                 >
                   {/* Imagem/Thumbnail */}
                   <div className="relative h-52 w-full overflow-hidden bg-slate-200 flex items-center justify-center">
-                    {item.imagemUrl ? (
+                    {getCoverImage(item) ? (
                       <img
-                        src={item.imagemUrl}
+                        src={getCoverImage(item)}
                         alt={item.titulo}
                         className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
                       />

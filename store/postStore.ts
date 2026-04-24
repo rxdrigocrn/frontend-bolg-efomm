@@ -7,6 +7,7 @@ type Post = {
   slug: string;
   conteudo: string;
   imagemUrl: string;
+  imagemUrls?: string[];
   publicado: boolean;
   tags?: Array<{
     id: string;
@@ -31,6 +32,7 @@ type CreatePostInput = {
   titulo: string;
   conteudo: string;
   imagemUrl?: string;
+  imagemUrls?: string[];
   publicado: boolean;
   tags?: string[];
 };

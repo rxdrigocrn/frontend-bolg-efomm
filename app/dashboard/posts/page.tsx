@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { usePostStore } from "@/store/postStore";
 import { useTagStore } from "@/store/tagStore";
 import { Plus, X, FileText, Trash2, Pencil, AlertTriangle, Tags } from "lucide-react";
@@ -237,12 +237,12 @@ function PostModal({
   const [form, setForm] = useState({
     titulo: "",
     conteudo: "",
-    imagemUrl: "",
+    imagemUrlsText: "",
     publicado: true,
     tagIds: [] as string[],
   });
 
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedTagId, setSelectedTagId] = useState("");
 
@@ -255,10 +255,16 @@ function PostModal({
       : [];
 
     if (postToEdit) {
+      const existingImageUrls = Array.isArray(postToEdit.imagemUrls)
+        ? postToEdit.imagemUrls
+        : postToEdit.imagemUrl
+          ? [postToEdit.imagemUrl]
+          : [];
+
       setForm({
         titulo: postToEdit.titulo || "",
         conteudo: postToEdit.conteudo || "",
-        imagemUrl: postToEdit.imagemUrl || "",
+        imagemUrlsText: existingImageUrls.join("\n"),
         publicado: postToEdit.publicado ?? true,
         tagIds: initialTagIds,
       });
@@ -266,14 +272,60 @@ function PostModal({
       setForm({
         titulo: "",
         conteudo: "",
-        imagemUrl: "",
+        imagemUrlsText: "",
         publicado: true,
         tagIds: [],
       });
     }
-    setFile(null); // Sempre reseta o arquivo
+    setFiles([]); // Sempre reseta os arquivos
     setSelectedTagId("");
   }, [postToEdit]);
+
+  const parseImageUrls = (raw: string) => {
+    return Array.from(
+      new Set(
+        raw
+          .split(/\n|,/)
+          .map((value) => value.trim())
+          .filter(Boolean),
+      ),
+    );
+  };
+
+  const urlPreviewImages = useMemo(() => parseImageUrls(form.imagemUrlsText), [form.imagemUrlsText]);
+
+  const filePreviewImages = useMemo(
+    () => files.map((item) => ({ file: item, previewUrl: URL.createObjectURL(item) })),
+    [files],
+  );
+
+  useEffect(() => {
+    return () => {
+      filePreviewImages.forEach((item) => URL.revokeObjectURL(item.previewUrl));
+    };
+  }, [filePreviewImages]);
+
+  const removeFile = (name: string, lastModified: number) => {
+    setFiles((current) =>
+      current.filter(
+        (fileItem) => !(fileItem.name === name && fileItem.lastModified === lastModified),
+      ),
+    );
+  };
+
+  const addFiles = (newFiles: File[]) => {
+    setFiles((current) => {
+      const merged = [...current, ...newFiles];
+      const uniqueByIdentity = new Map<string, File>();
+
+      merged.forEach((fileItem) => {
+        const key = `${fileItem.name}-${fileItem.size}-${fileItem.lastModified}`;
+        uniqueByIdentity.set(key, fileItem);
+      });
+
+      return Array.from(uniqueByIdentity.values());
+    });
+  };
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -283,21 +335,32 @@ function PostModal({
       let dataToSubmit: any;
 
       // Monta os dados (com ou sem arquivo)
-      if (file) {
+      if (files.length) {
         const formData = new FormData();
         formData.append("titulo", String(form.titulo));
         formData.append("conteudo", String(form.conteudo));
         formData.append("publicado", String(form.publicado));
-        formData.append("file", file);
+        files.forEach((fileItem) => formData.append("files", fileItem));
+
+        const imageUrls = parseImageUrls(form.imagemUrlsText);
+        if (imageUrls.length) {
+          formData.append("imagemUrl", imageUrls[0]);
+          imageUrls.forEach((url) => formData.append("imagemUrls", url));
+        }
+
         form.tagIds.forEach((tagId) => formData.append("tags", tagId));
         dataToSubmit = formData;
       } else {
+        const imageUrls = parseImageUrls(form.imagemUrlsText);
+
         dataToSubmit = {
           titulo: form.titulo,
           conteudo: form.conteudo,
           publicado: form.publicado,
           tags: form.tagIds,
-          ...(form.imagemUrl ? { imagemUrl: form.imagemUrl } : {}),
+          ...(imageUrls.length
+            ? { imagemUrls: imageUrls, imagemUrl: imageUrls[0] }
+            : {}),
         };
       }
 
@@ -379,31 +442,90 @@ function PostModal({
 
           <div className="space-y-1">
             <label className="text-xs font-semibold text-slate-500 uppercase">
-              {postToEdit && postToEdit.imagemUrl
-                ? "Substituir Imagem de Capa"
-                : "Upload de Imagem"}
+              {postToEdit && (postToEdit.imagemUrls?.length || postToEdit.imagemUrl)
+                ? "Substituir Imagem"
+                : "Upload de Imagens"}
             </label>
             <input
               type="file"
               accept="image/*"
-              onChange={(e) => setFile(e.target.files?.[0] || null)}
+              multiple
+              onChange={(e) => {
+                addFiles(Array.from(e.target.files || []));
+                e.currentTarget.value = "";
+              }}
               className="w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-all"
             />
+            <p className="text-[11px] text-slate-500">
+              Selecione uma ou mais imagens. Voce pode repetir a selecao para adicionar mais.
+            </p>
           </div>
 
-          {!file && (
-            <div className="space-y-1">
+          <div className="space-y-1">
+            <label className="text-xs font-semibold text-slate-500 uppercase">
+              URLs das Imagens (Opcional)
+            </label>
+            <textarea
+              value={form.imagemUrlsText}
+              rows={3}
+              placeholder={"https://imagem-1...\nhttps://imagem-2..."}
+              className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-y"
+              onChange={(e) =>
+                setForm({ ...form, imagemUrlsText: e.target.value })
+              }
+            />
+            <p className="text-[11px] text-slate-500">
+              Informe uma URL por linha ou separadas por vírgula.
+            </p>
+          </div>
+
+          {(filePreviewImages.length > 0 || urlPreviewImages.length > 0) && (
+            <div className="space-y-2">
               <label className="text-xs font-semibold text-slate-500 uppercase">
-                URL da Imagem de Capa (Opcional)
+                Pré-visualização das Imagens
               </label>
-              <input
-                value={form.imagemUrl}
-                placeholder="https://..."
-                className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-                onChange={(e) =>
-                  setForm({ ...form, imagemUrl: e.target.value })
-                }
-              />
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {filePreviewImages.map((item) => (
+                  <div
+                    key={`${item.file.name}-${item.file.lastModified}`}
+                    className="relative rounded-xl overflow-hidden border border-slate-200 bg-slate-100 aspect-[4/3]"
+                  >
+                    <img
+                      src={item.previewUrl}
+                      alt={item.file.name}
+                      className="h-full w-full object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeFile(item.file.name, item.file.lastModified)}
+                      className="absolute top-2 right-2 inline-flex items-center justify-center rounded-full bg-slate-900/70 text-white p-1 hover:bg-slate-900"
+                      title="Remover imagem"
+                    >
+                      <X size={12} />
+                    </button>
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-slate-900/80 to-transparent text-white text-[10px] px-2 py-1 truncate">
+                      {item.file.name}
+                    </div>
+                  </div>
+                ))}
+
+                {urlPreviewImages.map((imageUrl, index) => (
+                  <div
+                    key={`${imageUrl}-${index}`}
+                    className="relative rounded-xl overflow-hidden border border-slate-200 bg-slate-100 aspect-[4/3]"
+                  >
+                    <img
+                      src={imageUrl}
+                      alt={`URL ${index + 1}`}
+                      className="h-full w-full object-cover"
+                    />
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-slate-900/80 to-transparent text-white text-[10px] px-2 py-1 truncate">
+                      URL {index + 1}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 

@@ -157,9 +157,9 @@ export default function PerfilAutorPage() {
                       className="group cursor-pointer overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
                     >
                       <div className="relative h-48 w-full overflow-hidden bg-slate-100">
-                        {post.imagemUrl ? (
+                        {(post.imagemUrls?.find((url) => url?.trim()) || post.imagemUrl) ? (
                           <img
-                            src={post.imagemUrl}
+                            src={post.imagemUrls?.find((url) => url?.trim()) || post.imagemUrl}
                             alt={post.titulo}
                             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                           />

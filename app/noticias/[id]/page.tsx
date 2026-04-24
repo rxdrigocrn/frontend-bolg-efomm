@@ -8,6 +8,8 @@ import {
   CalendarDays,
   Newspaper,
   Clock,
+  ChevronLeft,
+  ChevronRight,
   Link as LinkIcon,
   MessageCircle, // Para substituir o Facebook (como um fórum/comunidade)
   Send, // Para substituir o Twitter (como um envio/tweet)
@@ -21,6 +23,7 @@ type PostDetail = {
   slug: string;
   conteudo: string;
   imagemUrl: string;
+  imagemUrls?: string[];
   publicado: boolean;
   tags?: Array<{
     id: string;
@@ -34,6 +37,17 @@ type PostDetail = {
     bio?: string;
   };
   createdAt: string;
+};
+
+const getPostImages = (post: PostDetail | null) => {
+  if (!post) return [] as string[];
+
+  const fromArray = Array.isArray(post.imagemUrls) ? post.imagemUrls : [];
+  const candidates = [...fromArray, post.imagemUrl]
+    .map((url) => String(url || "").trim())
+    .filter(Boolean);
+
+  return Array.from(new Set(candidates));
 };
 
 export default function NoticiaDetalhePage() {
@@ -51,6 +65,12 @@ export default function NoticiaDetalhePage() {
   const [post, setPost] = useState<PostDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const postImages = getPostImages(post);
+
+  useEffect(() => {
+    setCurrentImageIndex(0);
+  }, [post?.id]);
 
   const authorProfileId = post?.autor?.id || post?.autorId || "";
   const authorProfileHref = authorProfileId
@@ -128,6 +148,22 @@ export default function NoticiaDetalhePage() {
         </p>
       );
     });
+  };
+
+  const goToPrevImage = () => {
+    if (postImages.length <= 1) return;
+
+    setCurrentImageIndex((current) =>
+      current === 0 ? postImages.length - 1 : current - 1,
+    );
+  };
+
+  const goToNextImage = () => {
+    if (postImages.length <= 1) return;
+
+    setCurrentImageIndex((current) =>
+      current === postImages.length - 1 ? 0 : current + 1,
+    );
   };
 
   return (
@@ -260,18 +296,76 @@ export default function NoticiaDetalhePage() {
             {/* IMAGEM DE CAPA */}
             <div className="w-full mb-12">
               <div className="relative aspect-[16/9] w-full rounded-2xl overflow-hidden bg-slate-100 shadow-md border border-slate-100">
-                {post.imagemUrl ? (
-                  <img
-                    src={post.imagemUrl}
-                    alt={post.titulo}
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
-                  />
+                {postImages[0] ? (
+                  <div
+                    className="h-full w-full flex transition-transform duration-500 ease-out"
+                    style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}
+                  >
+                    {postImages.map((imageUrl, index) => (
+                      <img
+                        key={`${post.id}-slide-${index}`}
+                        src={imageUrl}
+                        alt={`${post.titulo} - imagem ${index + 1}`}
+                        className="h-full w-full shrink-0 object-cover"
+                      />
+                    ))}
+                  </div>
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-7xl bg-blue-900/5">
                     🚢
                   </div>
                 )}
+
+                {postImages.length > 1 && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={goToPrevImage}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-white/80 text-slate-700 border border-slate-200 shadow-sm backdrop-blur hover:bg-white transition-colors flex items-center justify-center"
+                      aria-label="Imagem anterior"
+                    >
+                      <ChevronLeft size={20} />
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={goToNextImage}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-white/80 text-slate-700 border border-slate-200 shadow-sm backdrop-blur hover:bg-white transition-colors flex items-center justify-center"
+                      aria-label="Próxima imagem"
+                    >
+                      <ChevronRight size={20} />
+                    </button>
+
+                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-slate-900/70 text-white text-xs font-semibold px-2.5 py-1 rounded-full">
+                      {currentImageIndex + 1} / {postImages.length}
+                    </div>
+                  </>
+                )}
               </div>
+
+              {postImages.length > 1 && (
+                <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+                  {postImages.map((imageUrl, index) => (
+                    <button
+                      key={`${post.id}-thumb-${index}`}
+                      type="button"
+                      onClick={() => setCurrentImageIndex(index)}
+                      className={`relative h-14 w-20 rounded-lg overflow-hidden border transition-all ${
+                        currentImageIndex === index
+                          ? "border-blue-600 ring-2 ring-blue-200"
+                          : "border-slate-200 hover:border-slate-300"
+                      }`}
+                      aria-label={`Ir para imagem ${index + 1}`}
+                    >
+                      <img
+                        src={imageUrl}
+                        alt={`${post.titulo} - miniatura ${index + 1}`}
+                        className="h-full w-full object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* CORPO DO TEXTO */}
