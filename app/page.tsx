@@ -5,7 +5,6 @@ import { useEffect } from "react";
 import { HamburgerMenu } from "@/components/HamburguerMenu";
 import { useManagementStore } from "@/store/managementStore";
 import Footer from "@/components/Footer";
-import { Instagram, Youtube, Facebook } from "lucide-react";
 import { FaFacebook, FaInstagram, FaYoutube } from "react-icons/fa";
 
 export default function Home() {
