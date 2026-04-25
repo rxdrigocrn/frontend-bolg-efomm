@@ -134,18 +134,20 @@ export default function Noticias() {
   </div>
 
   {/* Onda decorativa CORRIGIDA - Fill ajustado para bg-slate-50 (#f8fafc) */}
-  <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-[0]">
-    <svg 
-      className="relative block w-full h-[80px]" 
-      viewBox="0 0 1200 120" 
-      preserveAspectRatio="none"
-    >
-      <path 
-        d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V95.8C58.47,113.43,124.23,121.62,187.49,117.14c49.61-3.51,97.45-13.24,133.9-60.7Z" 
-        fill="#f8fafc"
-      ></path>
-    </svg>
-  </div>
+ {/* Onda decorativa para transição - CORREÇÃO DE FLUIDEZ */}
+<div className="absolute bottom-[-1px] left-0 w-full overflow-hidden leading-[0]">
+  <svg 
+    className="relative block w-[calc(100%+1.3px)] h-[80px]" 
+    style={{ transform: 'scaleX(1.01)', transformOrigin: 'center' }}
+    viewBox="0 0 1200 120" 
+    preserveAspectRatio="none"
+  >
+    <path 
+      d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V95.8C58.47,113.43,124.23,121.62,187.49,117.14c49.61-3.51,97.45-13.24,133.9-60.7Z" 
+      fill="#f8fafc"
+    ></path>
+  </svg>
+</div>
 </section>
 
         {/* MENSAGEM DE CARREGANDO OU VAZIO */}

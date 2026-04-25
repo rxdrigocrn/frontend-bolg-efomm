@@ -11,10 +11,8 @@ export function HamburgerMenu() {
     { name: "Início", href: "/", id: "01" },
     { name: "Notícias", href: "/noticias", id: "02" },
     { name: "Sobre Nós", href: "/sobre", id: "03" },
-    { name: "Contato", href: "/contato", id: "04" },
   ];
 
-  // Variantes para o container dos links (Stagger effect)
   const containerVariants = {
     open: {
       transition: {
