@@ -172,7 +172,7 @@ export default function Home() {
     rel="noopener noreferrer"
     className="text-white hover:text-pink-500 transition"
   >
-    <FaInstagram size={20} />
+    <FaInstagram size={30} />
   </a>
 
   <a
@@ -181,7 +181,7 @@ export default function Home() {
     rel="noopener noreferrer"
     className="text-white hover:text-red-500 transition"
   >
-    <FaYoutube size={20} />
+    <FaYoutube size={30} />
   </a>
 
   <a
@@ -190,7 +190,7 @@ export default function Home() {
     rel="noopener noreferrer"
     className="text-white hover:text-blue-500 transition"
   >
-    <FaFacebook size={20} />
+    <FaFacebook size={30} />
   </a>
               </div>
             </div>

@@ -11,8 +11,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Link as LinkIcon,
-  MessageCircle, // Para substituir o Facebook (como um fórum/comunidade)
-  Send, // Para substituir o Twitter (como um envio/tweet)
 } from "lucide-react";
 import { HamburgerMenu } from "@/components/HamburguerMenu";
 import { apiFetch } from "@/services/api";
@@ -66,6 +64,7 @@ export default function NoticiaDetalhePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [copied, setCopied] = useState(false);
   const postImages = getPostImages(post);
 
   useEffect(() => {
@@ -131,6 +130,21 @@ export default function NoticiaDetalhePage() {
       month: "long",
       year: "numeric",
     }).format(data);
+  };
+
+  const handleCopy = () => {
+    const url = typeof window !== "undefined" 
+      ? `${window.location.origin}/noticias/${postId}`
+      : "";
+    
+    if (url) {
+      navigator.clipboard.writeText(url).then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }).catch(() => {
+        alert("Erro ao copiar o link");
+      });
+    }
   };
 
   const calcularTempoLeitura = (texto: string) => {
@@ -398,23 +412,21 @@ export default function NoticiaDetalhePage() {
                     Compartilhar:
                   </span>
                   <button
-                    className="h-10 w-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-600 hover:text-blue-600 hover:border-blue-600 transition-colors"
+                    className={`h-10 w-10 rounded-full border flex items-center justify-center transition-all ${
+                      copied
+                        ? "border-green-600 bg-green-50 text-green-600"
+                        : "border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-600"
+                    }`}
                     title="Copiar Link"
+                    onClick={handleCopy}
                   >
                     <LinkIcon size={18} />
                   </button>
-                  <button
-                    className="h-10 w-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-600 hover:text-blue-400 hover:border-blue-400 transition-colors"
-                    title="Twitter"
-                  >
-                    <Send size={18} />
-                  </button>
-                  <button
-                    className="h-10 w-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-600 hover:text-blue-800 hover:border-blue-800 transition-colors"
-                    title="Facebook"
-                  >
-                    <MessageCircle size={18} />
-                  </button>
+                  {copied && (
+                    <span className="text-xs font-semibold text-green-600 animate-pulse">
+                      Copiado!
+                    </span>
+                  )}
                 </div>
               </div>
 
