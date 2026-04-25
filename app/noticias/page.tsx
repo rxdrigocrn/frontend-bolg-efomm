@@ -84,22 +84,65 @@ export default function Noticias() {
         </header>
 
         {/* HERO SECTION */}
-        <section className="relative overflow-hidden bg-blue-900 pt-20 pb-24 text-white">
-          <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]" />
-          <div className="relative max-w-7xl mx-auto px-6 text-center">
-            <span className="inline-block px-3 py-1 mb-4 rounded-full bg-blue-800 text-blue-200 text-xs font-bold uppercase tracking-widest">
-              Informativo Oficial
-            </span>
-            <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight">
-              Portal de Notícias{" "}
-              <span className="text-blue-400 text-3xl md:text-5xl">EFOMM</span>
-            </h1>
-            <p className="mt-6 text-lg md:text-xl text-blue-100 max-w-2xl mx-auto opacity-90 leading-relaxed">
-              Acompanhe em tempo real os acontecimentos, editais e a rotina da
-              Marinha Mercante.
-            </p>
-          </div>
-        </section>
+        {/* HERO SECTION REESTILIZADA */}
+<section className="relative overflow-hidden bg-[#0a192f] pt-32 pb-36 text-white">
+  {/* Elementos Visuais de Fundo */}
+  <div className="absolute inset-0 z-0">
+    {/* Gradiente Radial para dar profundidade */}
+    <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(30,58,138,0.5),transparent)]" />
+    
+    {/* Pattern de Pontos ou Grade */}
+    <div className="absolute inset-0 opacity-[0.05] bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
+    
+    {/* Círculos decorativos (Simulando Radar/Navegação) */}
+    <div className="absolute -top-24 -right-24 w-96 h-96 border border-yellow-500/10 rounded-full" />
+    <div className="absolute -bottom-24 -left-24 w-96 h-96 border border-yellow-500/10 rounded-full" />
+  </div>
+
+  <div className="relative z-10 max-w-7xl mx-auto px-6">
+    <div className="flex flex-col items-center text-center">
+      
+      {/* Badge Dourada */}
+      <div className="inline-flex items-center gap-2 px-4 py-1.5 mb-8 rounded-full bg-yellow-500/10 border border-yellow-500/20 backdrop-blur-sm">
+        <span className="relative flex h-2 w-2">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-500 opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-yellow-600"></span>
+        </span>
+        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#d4af37]">
+          Informativo Oficial Acadêmico
+        </span>
+      </div>
+
+      {/* Título com Dourado */}
+      <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-tight">
+        Portal de Notícias <br />
+        <span className="bg-gradient-to-r from-[#bf953f] via-[#fcf6ba] to-[#b38728] bg-clip-text text-transparent">
+          EFOMM
+        </span>
+      </h1>
+
+      {/* Subtítulo */}
+      <p className="mt-8 text-lg md:text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed font-light">
+        A conexão oficial com o cotidiano do <span className="text-[#d4af37] font-medium">CIABA</span>. 
+        Notícias, editais e a rotina da Marinha Mercante em um só lugar.
+      </p>
+
+      {/* Elemento Decorativo Inferior */}
+      <div className="mt-12 flex items-center gap-4">
+        <div className="h-[1px] w-12 bg-gradient-to-r from-transparent to-[#d4af37]" />
+        <Newspaper className="text-[#d4af37] opacity-50" size={20} />
+        <div className="h-[1px] w-12 bg-gradient-to-l from-transparent to-[#d4af37]" />
+      </div>
+    </div>
+  </div>
+
+  {/* Onda decorativa para transição */}
+  <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-[0] transform rotate-180">
+    <svg className="relative block w-full h-[60px]" viewBox="0 0 1200 120" preserveAspectRatio="none">
+      <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V95.8C58.47,113.43,124.23,121.62,187.49,117.14c49.61-3.51,97.45-13.24,133.9-60.7Z" fill="#f8fafc"></path>
+    </svg>
+  </div>
+</section>
 
         {/* MENSAGEM DE CARREGANDO OU VAZIO */}
         {loading ? (

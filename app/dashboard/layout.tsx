@@ -115,7 +115,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             <div className="h-10 w-10 rounded-full bg-blue-100 border border-blue-200 flex items-center justify-center text-blue-900 font-bold">
               {user?.avatarUrl ? (
                   <img
-                    src={`${BASE_URL}${user?.avatarUrl}`}
+                    src={`${user?.avatarUrl}`}
                     className="w-10 h-10 object-cover rounded-full"
                   />
                 ) : (
