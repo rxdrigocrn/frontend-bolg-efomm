@@ -5,6 +5,8 @@ import { useEffect } from "react";
 import { HamburgerMenu } from "@/components/HamburguerMenu";
 import { useManagementStore } from "@/store/managementStore";
 import Footer from "@/components/Footer";
+import { Instagram, Youtube, Facebook } from "lucide-react";
+import { FaFacebook, FaInstagram, FaYoutube } from "react-icons/fa";
 
 export default function Home() {
   const { members, loading, fetchMembers } = useManagementStore();
@@ -165,18 +167,32 @@ export default function Home() {
               <h3>Redes Sociais</h3>
 
               <div className="social-links-compact">
-                <a
-                  href="https://instagram.com/jornalcanal16"
-                  className="social-link-icon social-instagram"
-                />
-                <a
-                  href="https://youtube.com/@JornalCanal.16"
-                  className="social-link-icon social-youtube"
-                />
-                <a
-                  href="https://facebook.com/JornalCanal16"
-                  className="social-link-icon social-facebook"
-                />
+                 <a
+    href="https://instagram.com/jornalcanal16"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="text-white hover:text-pink-500 transition"
+  >
+    <FaInstagram size={20} />
+  </a>
+
+  <a
+    href="https://youtube.com/@JornalCanal.16"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="text-white hover:text-red-500 transition"
+  >
+    <FaYoutube size={20} />
+  </a>
+
+  <a
+    href="https://facebook.com/JornalCanal16"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="text-white hover:text-blue-500 transition"
+  >
+    <FaFacebook size={20} />
+  </a>
               </div>
             </div>
           </div>
