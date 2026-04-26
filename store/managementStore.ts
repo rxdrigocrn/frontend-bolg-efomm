@@ -59,13 +59,16 @@ const buildFormData = (data: CreateManagementInput | UpdateManagementInput) => {
   const formData = new FormData();
   const hasFile = data.file instanceof File;
 
-  if (data.nome !== undefined) formData.append("nome", data.nome);
-  if (data.cargo !== undefined) formData.append("cargo", data.cargo);
-  if (data.descricao !== undefined) formData.append("descricao", data.descricao);
-  if (!hasFile && data.photoUrl !== undefined) formData.append("photoUrl", data.photoUrl);
-  if (data.isManagement !== undefined) formData.append("isManagement", String(data.isManagement));
-  if (data.isSobre !== undefined) formData.append("isSobre", String(data.isSobre));
-  if (hasFile && data.file) formData.append("photoUrl", data.file);
+  formData.append("nome", data.nome);
+  formData.append("cargo", data.cargo);
+  formData.append("descricao", data.descricao);
+  formData.append("isManagement", String(data.isManagement));
+  formData.append("isSobre", String(data.isSobre));
+
+  // 🔥 SOMENTE file
+  if (hasFile && data.file) {
+    formData.append("file", data.file);
+  }
 
   return formData;
 };
