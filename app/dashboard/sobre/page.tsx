@@ -191,7 +191,6 @@ function MemberModal({ member, onClose, onSuccess, createMember, updateMember }:
     nome: "",
     cargo: "",
     descricao: "",
-    order: 0,
     isManagement: false,
     isSobre: false,
   });
@@ -203,6 +202,7 @@ function MemberModal({ member, onClose, onSuccess, createMember, updateMember }:
     }
 
     const objectUrl = URL.createObjectURL(file);
+
     setPreviewUrl(objectUrl);
 
     return () => URL.revokeObjectURL(objectUrl);
@@ -213,41 +213,39 @@ function MemberModal({ member, onClose, onSuccess, createMember, updateMember }:
       nome: member?.nome || "",
       cargo: member?.cargo || "",
       descricao: member?.descricao || "",
-      order: member?.order ?? 0,
       isManagement: member?.isManagement ?? false,
       isSobre: member?.isSobre ?? false,
     });
     setFile(null);
   }, [member]);
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+ const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  event.preventDefault();
 
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
-      const payload = {
-        nome: form.nome,
-        cargo: form.cargo,
-        descricao: form.descricao,
-        order: form.order,
-        isManagement: form.isManagement,
-        isSobre: form.isSobre,
-        photoUrl: member?.photoUrl,
-        file: file || undefined,
-      };
+    const payload = {
+      nome: form.nome,
+      cargo: form.cargo,
+      descricao: form.descricao,
+      isManagement: form.isManagement,
+      isSobre: form.isSobre,
+      photoUrl: member?.photoUrl,
+      file: file || undefined,
+    };
 
-      if (isEditing && member) {
-        await updateMember(member.id, payload);
-      } else {
-        await createMember(payload);
-      }
-
-      onSuccess();
-    } finally {
-      setLoading(false);
+    if (isEditing && member) {
+      await updateMember(member.id, payload);
+    } else {
+      await createMember(payload);
     }
-  };
+
+    onSuccess();
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
@@ -353,19 +351,6 @@ function MemberModal({ member, onClose, onSuccess, createMember, updateMember }:
               </label>
             </div>
 
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-500 uppercase">Upload de Foto</label>
-              <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-dashed border-slate-300 bg-slate-50 px-3 py-2.5 text-sm text-slate-600 hover:bg-slate-100">
-                <Upload size={16} />
-                <span>{file ? file.name : "Selecionar imagem"}</span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(event) => setFile(event.target.files?.[0] || null)}
-                />
-              </label>
-            </div>
           </div>
 
           <div className="flex items-center justify-end gap-3 pt-2">
