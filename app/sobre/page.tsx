@@ -22,39 +22,41 @@ export default function Sobre() {
   return (
     <div className="bg-[#0a192f] min-h-screen text-white">
       {/* HERO AJUSTADA PARA OCUPAR 100% DA TELA (Full Screen) */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-[100svh] flex items-center justify-center overflow-hidden py-20 sm:py-24 lg:py-28">
         {/* Background Layer */}
         <div className="absolute inset-0 z-0">
           <div 
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            className="absolute inset-0 scale-[1.02] bg-cover bg-center bg-no-repeat transition-transform duration-1000 hover:scale-105"
             style={{ backgroundImage: "url('/img/background1.jpg')" }} 
           />
           {/* Overlay Navy Profundo */}
-          <div className="absolute inset-0 bg-[#0a192f]/85 backdrop-blur-[3px]" />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0a192f]/40 to-[#0a192f]" />
+          <div className="absolute inset-0 bg-[#0a192f]/68 backdrop-blur-[1px]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0a192f]/30 to-[#0a192f]/90" />
+          <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#0a192f]/75 to-transparent sm:w-40" />
+          <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-[#0a192f]/75 to-transparent sm:w-40" />
         </div>
 
         <HamburgerMenu />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-6 flex flex-col items-center text-center">
+        <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-col items-center px-4 text-center sm:px-6 lg:px-8">
           <Image
             src="/img/logo.jpg"
             alt="Logo Jornal Canal 16"
             width={120}
             height={120}
-            className="rounded-full border-2 border-[#d4af37] p-1 mb-8 shadow-2xl animate-fade-in"
+            className="mb-8 rounded-full border-2 border-[#d4af37] p-1 shadow-2xl animate-fade-in"
           />
 
-          <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-tight mb-6">
+          <h1 className="mb-6 max-w-4xl text-5xl font-black tracking-tighter leading-tight sm:text-6xl md:text-8xl">
             Sobre <span className="bg-gradient-to-r from-[#bf953f] via-[#fcf6ba] to-[#b38728] bg-clip-text text-transparent">Nós</span>
           </h1>
 
-          <p className="mt-4 text-xl md:text-2xl text-slate-300 max-w-2xl mx-auto leading-relaxed font-light italic opacity-90">
+          <p className="mt-4 max-w-2xl text-lg font-light italic leading-relaxed text-slate-200 opacity-95 sm:text-xl md:text-2xl">
             "Conheça a equipe por trás do Jornal Canal 16"
           </p>
           
           {/* Indicador de Scroll Animado */}
-          <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-[#d4af37]/60">
+          <div className="absolute bottom-10 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2 text-[#d4af37]/60 sm:bottom-12">
             <span className="text-[10px] uppercase tracking-[0.3em] font-bold">Role para descobrir</span>
             <ChevronDown className="animate-bounce" size={24} />
           </div>

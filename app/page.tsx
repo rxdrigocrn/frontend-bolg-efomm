@@ -18,24 +18,26 @@ export default function Home() {
   return (
     <div className="bg-[#0a192f] min-h-screen text-white">
       {/* HERO COM IMAGEM DE FUNDO MANTIDA */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20 pb-32">
+      <section className="relative min-h-[100svh] flex items-center justify-center overflow-hidden py-20 sm:py-24 lg:py-28">
         {/* Background Layer */}
         <div className="absolute inset-0 z-0">
           {/* A sua imagem de fundo original */}
           <div 
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-1000 hover:scale-105"
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-[1.02] transition-transform duration-1000 hover:scale-105"
             style={{ backgroundImage: "url('/img/7setembro.jpg')" }} // Certifique-se que o caminho está correto
           />
           {/* Overlay para dar o tom Navy e garantir leitura do texto */}
-          <div className="absolute inset-0 bg-[#0a192f]/80 backdrop-blur-[2px]" />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0a192f]/50 to-[#0a192f]" />
+          <div className="absolute inset-0 bg-[#0a192f]/65 backdrop-blur-[1px]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0a192f]/35 to-[#0a192f]/90" />
+          <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#0a192f]/75 to-transparent sm:w-40" />
+          <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-[#0a192f]/75 to-transparent sm:w-40" />
         </div>
 
         <HamburgerMenu />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-6 flex flex-col items-center text-center">
+        <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-col items-center px-4 text-center sm:px-6 lg:px-8">
           {/* Badge Decorativo */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 mb-8 rounded-full bg-yellow-500/10 border border-yellow-500/20 backdrop-blur-md">
+          <div className="inline-flex max-w-[92vw] items-center gap-2 rounded-full border border-yellow-500/20 bg-yellow-500/10 px-4 py-1.5 mb-8 backdrop-blur-md">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-500 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-yellow-600"></span>
@@ -53,18 +55,18 @@ export default function Home() {
             className="rounded-full border-2 border-[#d4af37] p-1 mb-8 shadow-2xl"
           />
 
-          <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-tight mb-4">
+          <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-tight mb-4 max-w-4xl">
             Jornal <br />
             <span className="bg-gradient-to-r from-[#bf953f] via-[#fcf6ba] to-[#b38728] bg-clip-text text-transparent">
               Jornal Canal 16
             </span>
           </h1>
 
-          <p className="mt-6 text-lg md:text-xl text-slate-200 max-w-2xl mx-auto leading-relaxed font-light">
+          <p className="mt-6 max-w-2xl text-lg font-light leading-relaxed text-slate-200 md:text-xl">
             Informações, notícias e histórias dos Alunos da <span className="text-[#d4af37] font-medium">EFOMM</span>
           </p>
 
-          <p className="mt-4 text-sm uppercase tracking-[0.3em] text-[#d4af37]/80 font-bold">
+          <p className="mt-4 max-w-[92vw] text-sm font-bold uppercase tracking-[0.3em] text-[#d4af37]/80">
             Escola de Formação de Oficiais da Marinha Mercante • Belém, Pará
           </p>
 

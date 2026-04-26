@@ -185,21 +185,28 @@ const [showToast, setShowToast] = useState(false);
 
       {/* HEADER MINIMALISTA */}
       <header className="sticky top-0 z-40 w-full border-b border-slate-100 bg-white/80 backdrop-blur-md">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 flex h-16 items-center justify-between">
-          <Link href="/noticias">
-            <img
-              src="/img/logo.jpg"
-              className="w-12 h-12 object-cover rounded-lg"
-            />
-          </Link>
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 grid grid-cols-3 items-center">
+          <div className="flex items-center justify-start">
+            <Link href="/noticias" className="shrink-0">
+              <img
+                src="/img/logo.jpg"
+                alt="Logo"
+                className="w-10 h-10 md:w-12 md:h-12 object-cover rounded-lg"
+              />
+            </Link>
+          </div>
 
-          <button
-            onClick={() => router.push("/noticias")}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-slate-500 font-medium text-sm hover:bg-slate-50 hover:text-blue-900 transition-all"
-          >
-            <ArrowLeft size={16} />{" "}
-            <span className="hidden sm:inline">Voltar para notícias</span>
-          </button>
+          <div className="flex items-center justify-center">
+            <button
+              onClick={() => router.push("/noticias")}
+              className="inline-flex items-center gap-2 px-3 py-1.5 md:px-5 md:py-2 rounded-full bg-slate-100 text-slate-700 font-bold text-[10px] md:text-xs hover:bg-blue-900 hover:text-white transition-all duration-300 whitespace-nowrap border border-slate-200 shadow-sm uppercase tracking-wider"
+            >
+              <ArrowLeft size={14} className="hidden sm:block" />
+              <span>Voltar</span>
+            </button>
+          </div>
+
+          <div className="flex items-center justify-end" />
         </div>
       </header>
 
