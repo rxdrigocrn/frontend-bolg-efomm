@@ -53,17 +53,23 @@ const normalizeMembersPayload = (payload: unknown): ManagementMember[] => {
   return [];
 };
 
+const toJsonPayload = (data: CreateManagementInput | UpdateManagementInput) => {
+  const { file, ...rest } = data;
+  return JSON.stringify(rest);
+};
+
 const buildFormData = (data: CreateManagementInput | UpdateManagementInput) => {
   const formData = new FormData();
+  const hasFile = data.file instanceof File;
 
   if (data.nome !== undefined) formData.append("nome", data.nome);
   if (data.cargo !== undefined) formData.append("cargo", data.cargo);
   if (data.descricao !== undefined) formData.append("descricao", data.descricao);
-  if (data.photoUrl !== undefined) formData.append("photoUrl", data.photoUrl);
+  if (!hasFile && data.photoUrl !== undefined) formData.append("photoUrl", data.photoUrl);
   if (data.order !== undefined) formData.append("order", String(data.order));
   if (data.isManagement !== undefined) formData.append("isManagement", String(data.isManagement));
   if (data.isSobre !== undefined) formData.append("isSobre", String(data.isSobre));
-  if (data.file) formData.append("file", data.file);
+  if (hasFile && data.file) formData.append("photoUrl", data.file);
 
   return formData;
 };
@@ -79,7 +85,7 @@ export const useManagementStore = create<ManagementState>((set, get) => ({
   },
 
   createMember: async (data) => {
-    const payload = data.file ? buildFormData(data) : JSON.stringify(data);
+    const payload = data.file ? buildFormData(data) : toJsonPayload(data);
 
     await apiFetch("/management", {
       method: "POST",
@@ -90,7 +96,7 @@ export const useManagementStore = create<ManagementState>((set, get) => ({
   },
 
   updateMember: async (id, data) => {
-    const payload = data.file ? buildFormData(data) : JSON.stringify(data);
+    const payload = data.file ? buildFormData(data) : toJsonPayload(data);
 
     await apiFetch(`/management/${id}`, {
       method: "PATCH",

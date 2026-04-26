@@ -217,12 +217,25 @@ function UserModal({ user, onClose, onSuccess, createUser, updateUser, tags }: U
     email: "",
     password: "",
     bio: "",
-    avatarUrl: "",
     role: "REDATOR" as "REDATOR" | "PRESIDENTE",
     tagIds: [] as string[],
   });
   const [loading, setLoading] = useState(false);
   const [selectedTagId, setSelectedTagId] = useState("");
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreviewUrl, setAvatarPreviewUrl] = useState("");
+
+  useEffect(() => {
+    if (!avatarFile) {
+      setAvatarPreviewUrl(user?.avatarUrl || "");
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(avatarFile);
+    setAvatarPreviewUrl(objectUrl);
+
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [avatarFile, user]);
 
   useEffect(() => {
     setForm({
@@ -230,12 +243,17 @@ function UserModal({ user, onClose, onSuccess, createUser, updateUser, tags }: U
       email: user?.email || "",
       password: "",
       bio: user?.bio || "",
-      avatarUrl: user?.avatarUrl || "",
       role: user?.role || "REDATOR",
       tagIds: initialTagIds,
     });
     setSelectedTagId("");
+    setAvatarFile(null);
   }, [initialTagIds, user]);
+
+  const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] || null;
+    setAvatarFile(file);
+  };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -247,13 +265,16 @@ function UserModal({ user, onClose, onSuccess, createUser, updateUser, tags }: U
           nome: form.nome,
           email: form.email,
           bio: form.bio,
-          avatarUrl: form.avatarUrl,
           role: form.role,
           tagIds: form.tagIds,
         };
 
         if (form.password.trim()) {
           payload.password = form.password;
+        }
+
+        if (avatarFile) {
+          payload.avatarFile = avatarFile;
         }
 
         await updateUser(user.id, payload);
@@ -263,7 +284,7 @@ function UserModal({ user, onClose, onSuccess, createUser, updateUser, tags }: U
           email: form.email,
           password: form.password,
           bio: form.bio,
-          avatarUrl: form.avatarUrl,
+          avatarFile: avatarFile || undefined,
           role: form.role,
           tagIds: form.tagIds,
         });
@@ -340,6 +361,31 @@ function UserModal({ user, onClose, onSuccess, createUser, updateUser, tags }: U
               />
             </div>
 
+            <div className="space-y-1 md:col-span-2">
+              <label className="text-xs font-semibold text-slate-500 uppercase">Foto do Usuário</label>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4 rounded-2xl border border-dashed border-slate-200 bg-slate-50/60 p-4">
+                <div className="h-20 w-20 rounded-2xl bg-white border border-slate-200 overflow-hidden flex items-center justify-center shadow-sm">
+                  {avatarPreviewUrl ? (
+                    <img src={avatarPreviewUrl} alt="Pré-visualização do avatar" className="h-full w-full object-cover" />
+                  ) : (
+                    <UsersIcon size={28} className="text-slate-300" />
+                  )}
+                </div>
+
+                <div className="flex-1 space-y-2">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="block w-full text-sm text-slate-600 file:mr-4 file:rounded-xl file:border-0 file:bg-blue-900 file:px-4 file:py-2.5 file:text-sm file:font-medium file:text-white hover:file:bg-blue-800"
+                    onChange={handleAvatarChange}
+                  />
+                  <p className="text-xs text-slate-500">
+                    Use uma imagem para representar o usuário. Em edição, deixe em branco para manter a foto atual.
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <div className="space-y-1">
               <label className="text-xs font-semibold text-slate-500 uppercase">
                 {isEditing ? "Nova Senha" : "Senha Provisória"}
@@ -354,26 +400,16 @@ function UserModal({ user, onClose, onSuccess, createUser, updateUser, tags }: U
               />
             </div>
 
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-500 uppercase">Avatar URL</label>
-              <input
-                value={form.avatarUrl}
-                placeholder="/uploads/avatar.webp"
-                className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-                onChange={(e) => setForm({ ...form, avatarUrl: e.target.value })}
+            <div className="space-y-1 md:col-span-2">
+              <label className="text-xs font-semibold text-slate-500 uppercase">Bio</label>
+              <textarea
+                value={form.bio}
+                rows={3}
+                placeholder="Breve descrição do usuário"
+                className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none"
+                onChange={(e) => setForm({ ...form, bio: e.target.value })}
               />
             </div>
-          </div>
-
-          <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-500 uppercase">Bio</label>
-            <textarea
-              value={form.bio}
-              rows={3}
-              placeholder="Breve descrição do usuário"
-              className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none"
-              onChange={(e) => setForm({ ...form, bio: e.target.value })}
-            />
           </div>
 
           {canChooseRole && (
