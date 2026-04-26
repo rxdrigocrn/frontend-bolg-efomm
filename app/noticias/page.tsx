@@ -62,26 +62,40 @@ export default function Noticias() {
 
       <div className="bg-slate-50 min-h-screen font-sans text-slate-900">
         {/* HEADER / NAV */}
-        <header className="sticky top-0 z-40 w-full border-b border-slate-200 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 flex h-16 items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link href="/">
-                <img
-                  src="/img/logo.jpg"
-                  className="w-12 h-12 object-cover rounded-lg"
-                />
-              </Link>
-            </div>
+       <header className="sticky top-0 z-40 w-full border-b border-slate-200 bg-white/95 backdrop-blur-sm">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 grid grid-cols-3 items-center">
+    
+    {/* COLUNA 1: Logo (Alinhado à esquerda) */}
+    <div className="flex items-center justify-start">
+      <Link href="/" className="shrink-0">
+        <img
+          src="/img/logo.jpg"
+          alt="Logo"
+          className="w-10 h-10 md:w-12 md:h-12 object-cover rounded-lg shadow-sm"
+        />
+      </Link>
+    </div>
 
-            <button
-              onClick={() => router.push("/login")}
-              className="flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 text-slate-700 font-medium text-sm hover:bg-blue-900 hover:text-white transition-all duration-300"
-            >
-              <LogIn size={16} />
-              Área do Redator
-            </button>
-          </div>
-        </header>
+    {/* COLUNA 2: Botão Área do Redator (Centralizado) */}
+    <div className="flex items-center justify-center">
+      <button
+        onClick={() => router.push("/login")}
+        className="flex items-center gap-2 px-3 py-1.5 md:px-5 md:py-2 rounded-full bg-slate-100 text-slate-700 font-bold text-[10px] md:text-xs hover:bg-blue-900 hover:text-white transition-all duration-300 whitespace-nowrap border border-slate-200 shadow-sm uppercase tracking-wider"
+      >
+        <LogIn size={14} className="hidden sm:block" />
+        <span>Área do Redator</span>
+      </button>
+    </div>
+
+    {/* COLUNA 3: Espaço reservado (Para equilibrar o layout ou ícones extras) */}
+    <div className="flex items-center justify-end">
+      {/* Se o seu HamburgerMenu for um botão flutuante que fica na direita, 
+          este espaço garante que o botão central não bata nele.
+      */}
+    </div>
+
+  </div>
+</header>
 
         {/* HERO SECTION */}
         {/* HERO SECTION CORRIGIDA */}

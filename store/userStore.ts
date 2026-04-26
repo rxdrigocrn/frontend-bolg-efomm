@@ -22,7 +22,7 @@ export type CreateUserInput = {
   email: string;
   password: string;
   bio?: string;
-  avatarUrl?: string;
+  avatarFile?: File;
   role?: "REDATOR" | "PRESIDENTE";
   tagIds?: string[];
 };
@@ -32,6 +32,7 @@ export type UpdateUserInput = {
   email?: string;
   password?: string;
   bio?: string;
+  avatarFile?: File;
   avatarUrl?: string;
   role?: "REDATOR" | "PRESIDENTE";
   tagIds?: string[];
@@ -49,6 +50,28 @@ type UserState = {
 export const useUserStore = create<UserState>((set) => ({
   users: [],
 
+  createUser: async (data) => {
+    const formData = new FormData();
+    formData.append("nome", data.nome);
+    formData.append("email", data.email);
+    formData.append("password", data.password);
+
+    formData.append("bio", data.bio ?? "");
+    if (data.avatarFile) {
+      formData.append("file", data.avatarFile);
+    }
+
+    if (data.role) formData.append("role", data.role);
+    data.tagIds?.forEach((tagId) => formData.append("tagIds", tagId));
+
+    await apiFetch("/users", {
+      method: "POST",
+      body: formData,
+    });
+
+    await useUserStore.getState().fetchUsers();
+  },
+
   fetchUsers: async () => {
     const data = await apiFetch("/users");
     const currentUserId = useAuthStore.getState().user?.id;
@@ -59,20 +82,32 @@ export const useUserStore = create<UserState>((set) => ({
     });
   },
 
-  createUser: async (data) => {
-    await apiFetch("/users", {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
-
-    await useUserStore.getState().fetchUsers();
-  },
-
   updateUser: async (id, data) => {
-    await apiFetch(`/users/${id}`, {
-      method: "PATCH",
-      body: JSON.stringify(data),
-    });
+    const hasFile = data.avatarFile instanceof File;
+
+    if (hasFile) {
+      const formData = new FormData();
+
+      if (data.nome !== undefined) formData.append("nome", data.nome);
+      if (data.email !== undefined) formData.append("email", data.email);
+      if (data.password !== undefined) formData.append("password", data.password);
+      if (data.bio !== undefined) formData.append("bio", data.bio);
+      if (data.role !== undefined) formData.append("role", data.role);
+      if (data.avatarFile) {
+        formData.append("file", data.avatarFile);
+      }
+      data.tagIds?.forEach((tagId) => formData.append("tagIds", tagId));
+
+      await apiFetch(`/users/${id}`, {
+        method: "PATCH",
+        body: formData,
+      });
+    } else {
+      await apiFetch(`/users/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify(data),
+      });
+    }
 
     await useUserStore.getState().fetchUsers();
   },

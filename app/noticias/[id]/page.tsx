@@ -66,10 +66,23 @@ export default function NoticiaDetalhePage() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [copied, setCopied] = useState(false);
   const postImages = getPostImages(post);
-
+const [showToast, setShowToast] = useState(false);
   useEffect(() => {
     setCurrentImageIndex(0);
   }, [post?.id]);
+
+  const handleCopy = async () => {
+  try {
+    // Captura a URL da janela do navegador
+    await navigator.clipboard.writeText(window.location.href);
+    
+    // Ativa o toast e o remove após 3 segundos
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
+  } catch (err) {
+    console.error("Falha ao copiar link:", err);
+  }
+};
 
   const authorProfileId = post?.autor?.id || post?.autorId || "";
   const authorProfileHref = authorProfileId
@@ -132,20 +145,6 @@ export default function NoticiaDetalhePage() {
     }).format(data);
   };
 
-  const handleCopy = () => {
-    const url = typeof window !== "undefined" 
-      ? `${window.location.origin}/noticias/${postId}`
-      : "";
-    
-    if (url) {
-      navigator.clipboard.writeText(url).then(() => {
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      }).catch(() => {
-        alert("Erro ao copiar o link");
-      });
-    }
-  };
 
   const calcularTempoLeitura = (texto: string) => {
     if (!texto) return 1;
@@ -422,11 +421,7 @@ export default function NoticiaDetalhePage() {
                   >
                     <LinkIcon size={18} />
                   </button>
-                  {copied && (
-                    <span className="text-xs font-semibold text-green-600 animate-pulse">
-                      Copiado!
-                    </span>
-                  )}
+               
                 </div>
               </div>
 
@@ -465,7 +460,16 @@ export default function NoticiaDetalhePage() {
             </div>
           </article>
         )}
+ {showToast && (
+  <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-bottom-4">
+    <div className="bg-slate-900 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 border border-slate-700">
+      <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse" />
+      <span className="text-sm font-bold tracking-tight">Link copiado com sucesso!</span>
+    </div>
+  </div>
+)}
       </main>
+
     </div>
   );
 }
