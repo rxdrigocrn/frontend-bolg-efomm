@@ -91,8 +91,16 @@ export default function UsersPage() {
                 className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-4 hover:bg-slate-50/50 transition-colors"
               >
                 <div className="flex items-center gap-4">
-                  <div className="h-10 w-10 rounded-full bg-blue-100 border border-blue-200 flex items-center justify-center text-blue-900 font-bold">
-                    {u.nome?.charAt(0).toUpperCase() || "U"}
+                  <div className="h-10 w-10 rounded-full bg-blue-100 border border-blue-200 flex items-center justify-center text-blue-900 font-bold overflow-hidden">
+                    {u.avatarUrl ? (
+                      <img
+                        src={u.avatarUrl}
+                        alt={u.nome || "Avatar do usuário"}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      u.nome?.charAt(0).toUpperCase() || "U"
+                    )}
                   </div>
                   <div className="min-w-0">
                     <p className="font-semibold text-slate-900 text-sm">{u.nome}</p>
