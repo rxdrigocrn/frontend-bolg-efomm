@@ -190,65 +190,100 @@ export default function Noticias() {
 
         {/* BARRA DE BUSCA E FILTRO POR TAGS */}
         <div className="max-w-7xl mx-auto px-6">
-          <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
-            <form onSubmit={handleSearchSubmit} className="flex items-center gap-3">
-              <input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Buscar por título"
-                className="flex-1 px-4 py-2 border rounded-lg focus:outline-none"
-              />
-              {/* Select múltiplo para filtrar por tags (adicionado) */}
-              {tags && tags.length > 0 && (
-                <select
-                  multiple
-                  value={selectedTagIds}
-                  onChange={(e) => {
-                    const values = Array.from(e.target.selectedOptions).map((o) => o.value);
-                    setCurrentPage(1);
-                    setSelectedTagIds(values);
-                  }}
-                  className="px-3 py-2 border border-slate-200 rounded-xl bg-white text-sm max-h-36 overflow-auto shadow-sm min-w-[180px] focus:outline-none focus:ring-2 focus:ring-blue-200"
-                  aria-label="Filtrar por tags"
-                >
-                  {tags.map((t) => (
-                    <option key={t.id} value={t.id}>
-                      {t.name}
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <form onSubmit={handleSearchSubmit} className="flex flex-col gap-4">
+              <div className="flex items-center gap-3 flex-wrap md:flex-nowrap">
+                <input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Buscar por título ou conteúdo"
+                  className="flex-1 px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white text-slate-900"
+                />
+                {/* Select múltiplo para filtrar por tags */}
+                {tags && tags.length > 0 && (
+                  <select
+                    multiple
+                    title="Selecione uma ou mais tags para filtrar (use Ctrl/Cmd para seleção múltipla)"
+                    value={selectedTagIds}
+                    onChange={(e) => {
+                      const values = Array.from(e.target.selectedOptions).map((o) => o.value);
+                      setCurrentPage(1);
+                      setSelectedTagIds(values);
+                    }}
+                    className="px-4 py-2.5 border border-slate-300 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all shadow-sm min-w-[200px] max-h-48 overflow-y-auto text-slate-900 font-medium"
+                    aria-label="Filtrar por tags"
+                  >
+                    <option value="" disabled>
+                      Selecione as tags...
                     </option>
-                  ))}
-                </select>
+                    {tags.map((t) => (
+                      <option key={t.id} value={t.id} className="text-slate-900">
+                        {t.name}
+                      </option>
+                    ))}
+                  </select>
+                )}
+                <button
+                  type="submit"
+                  className="px-6 py-2.5 bg-blue-900 text-white rounded-lg hover:bg-blue-800 transition-colors font-semibold shadow-sm"
+                >
+                  Buscar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setQuery("");
+                    setSearch("");
+                    setSelectedTagIds([]);
+                    setCurrentPage(1);
+                  }}
+                  className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-sm font-medium transition-colors text-slate-700"
+                >
+                  Limpar filtros
+                </button>
+              </div>
+
+              {/* Indicador de tags selecionadas com botões para remover */}
+              {selectedTagIds.length > 0 && (
+                <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-100">
+                  <span className="text-xs font-semibold text-slate-500 mt-1">Tags selecionadas:</span>
+                  {selectedTagIds.map((tagId) => {
+                    const tag = tags.find((t) => t.id === tagId);
+                    return tag ? (
+                      <button
+                        key={tagId}
+                        onClick={() => toggleTag(tagId)}
+                        className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-900 border border-blue-300 rounded-full text-xs font-semibold hover:bg-blue-200 transition-colors"
+                      >
+                        {tag.name}
+                        <span className="text-blue-900 font-bold hover:text-blue-700">×</span>
+                      </button>
+                    ) : null;
+                  })}
+                </div>
               )}
-              <button
-                type="submit"
-                className="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800"
-              >
-                Buscar
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setQuery("");
-                  setSearch("");
-                  setSelectedTagIds([]);
-                  setCurrentPage(1);
-                }}
-                className="px-3 py-2 bg-slate-100 rounded-lg text-sm"
-              >
-                Limpar
-              </button>
             </form>
 
+            {/* Tags disponíveis como botões para seleção rápida */}
             {tags && tags.length > 0 && (
-              <div className="mt-3 flex flex-wrap gap-2">
-                {tags.map((t) => (
-                  <button
-                    key={t.id}
-                    onClick={() => toggleTag(t.id)}
-                    className={`px-3 py-1 rounded-full text-sm border ${selectedTagIds.includes(t.id) ? 'bg-blue-900 text-white border-blue-900' : 'bg-slate-50 text-slate-700 border-slate-200'}`}
-                  >
-                    {t.name}
-                  </button>
-                ))}
+              <div className="mt-4 pt-4 border-t border-slate-100">
+                <p className="text-xs font-semibold text-slate-500 mb-3">Ou selecione por categoria:</p>
+                <div className="flex flex-wrap gap-2">
+                  {tags.map((t) => (
+                    <button
+                      key={t.id}
+                      onClick={() => toggleTag(t.id)}
+                      type="button"
+                      className={`px-4 py-2 rounded-full text-sm font-medium border-2 transition-all duration-200 ${
+                        selectedTagIds.includes(t.id)
+                          ? 'bg-blue-900 text-white border-blue-900 shadow-md'
+                          : 'bg-white text-slate-700 border-slate-200 hover:border-blue-900 hover:text-blue-900'
+                      }`}
+                    >
+                      {t.name}
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
           </div>
