@@ -11,9 +11,11 @@ import {
   ChevronLeft,
   ChevronRight,
   Link as LinkIcon,
+  Heart,
 } from "lucide-react";
 import { HamburgerMenu } from "@/components/HamburguerMenu";
 import { apiFetch } from "@/services/api";
+import { useAuthStore } from "@/store/authStore";
 
 type PostDetail = {
   id: string;
@@ -51,6 +53,7 @@ const getPostImages = (post: PostDetail | null) => {
 export default function NoticiaDetalhePage() {
   const router = useRouter();
   const params = useParams();
+  const { user } = useAuthStore();
 
   const postId = useMemo(() => {
     const value = params?.id;
@@ -65,6 +68,9 @@ export default function NoticiaDetalhePage() {
   const [error, setError] = useState<string | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [copied, setCopied] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
+  const [liked, setLiked] = useState(false);
+  const [liking, setLiking] = useState(false);
   const postImages = getPostImages(post);
 const [showToast, setShowToast] = useState(false);
   useEffect(() => {
@@ -127,10 +133,70 @@ const [showToast, setShowToast] = useState(false);
 
     void fetchPost();
 
+    const fetchLikes = async () => {
+      try {
+        const response = await apiFetch(`/posts/${postId}/likes`);
+        const total = Number(response?.likes ?? response?.total ?? 0);
+        if (active) {
+          setLikesCount(Number.isFinite(total) ? total : 0);
+        }
+      } catch {
+        if (active) {
+          setLikesCount(0);
+        }
+      }
+    };
+
+    void fetchLikes();
+
     return () => {
       active = false;
     };
   }, [postId]);
+
+  useEffect(() => {
+    if (!postId) return;
+
+    const storageKey = `post-like:${postId}:${user?.id || "anonymous"}`;
+    setLiked(window.localStorage.getItem(storageKey) === "1");
+  }, [postId, user?.id]);
+
+  const getLikeStorageKey = () => `post-like:${postId}:${user?.id || "anonymous"}`;
+
+  const persistLikeState = (value: boolean) => {
+    const storageKey = getLikeStorageKey();
+    if (value) {
+      window.localStorage.setItem(storageKey, "1");
+    } else {
+      window.localStorage.removeItem(storageKey);
+    }
+    setLiked(value);
+  };
+
+  const handleLike = async () => {
+    if (!postId || liking) return;
+
+    setLiking(true);
+    try {
+      if (liked) {
+        await apiFetch("/posts/like", {
+          method: "DELETE",
+          body: JSON.stringify({ postId, userId: user?.id }),
+        });
+        persistLikeState(false);
+        setLikesCount((current) => Math.max(0, current - 1));
+      } else {
+        await apiFetch("/posts/like", {
+          method: "POST",
+          body: JSON.stringify({ postId, userId: user?.id }),
+        });
+        persistLikeState(true);
+        setLikesCount((current) => current + 1);
+      }
+    } finally {
+      setLiking(false);
+    }
+  };
 
   // Função para formatar a data
   const formatarData = (dataString: string) => {
@@ -414,6 +480,22 @@ const [showToast, setShowToast] = useState(false);
                 </div>
 
                 <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={handleLike}
+                    disabled={liking}
+                    className={`inline-flex items-center gap-2 h-10 px-4 rounded-full border text-sm font-semibold transition-all ${
+                      liked
+                        ? "border-rose-600 bg-rose-50 text-rose-700"
+                        : "border-slate-200 text-slate-600 hover:text-rose-700 hover:border-rose-300 hover:bg-rose-50"
+                    } ${liking ? "opacity-60 pointer-events-none" : ""}`}
+                    title={liked ? "Descurtir" : "Curtir"}
+                  >
+                    <Heart size={16} fill={liked ? "currentColor" : "none"} />
+                    <span>{liked ? "Curtido" : "Curtir"}</span>
+                    <span className="text-xs font-bold opacity-80">{likesCount}</span>
+                  </button>
+
                   <span className="text-sm font-semibold text-slate-500 mr-2">
                     Compartilhar:
                   </span>

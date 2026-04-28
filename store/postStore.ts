@@ -43,7 +43,7 @@ type PostState = {
   loading: boolean;
 
   fetchPosts: () => Promise<void>;
-  fetchPublicPosts: (page?: number, limit?: number) => Promise<void>;
+  fetchPublicPosts: (opts?: { page?: number; limit?: number; search?: string; tagIds?: string[]; publicado?: boolean }) => Promise<void>;
   createPost: (data: FormData | CreatePostInput) => Promise<void>;
   updatePost: (id: string, data: any) => Promise<void>; // Any para suportar FormData ou Objeto
   deletePost: (id: string) => Promise<void>;
@@ -66,11 +66,29 @@ export const usePostStore = create<PostState>((set, get) => ({
   },
 
   // Busca para o Portal Público (com paginação)
-  fetchPublicPosts: async (page = 1, limit = 9) => {
+  fetchPublicPosts: async (opts = {}) => {
+    const { page = 1, limit = 9, search, tagIds, publicado } = opts as {
+      page?: number;
+      limit?: number;
+      search?: string;
+      tagIds?: string[];
+      publicado?: boolean;
+    };
+
     set({ loading: true });
-    // Ajuste a rota para bater com o seu backend
-    const data = await apiFetch(`/posts/public?page=${page}&limit=${limit}`);
-    
+
+    const params = new URLSearchParams();
+    params.set("page", String(page));
+    params.set("limit", String(limit));
+    if (typeof search === "string" && search.trim()) params.set("search", search.trim());
+    if (typeof publicado === "boolean") params.set("publicado", String(publicado));
+    if (Array.isArray(tagIds) && tagIds.length > 0) {
+      tagIds.forEach((id) => params.append("tagIds", id));
+    }
+
+    const query = params.toString() ? `?${params.toString()}` : "";
+    const data = await apiFetch(`/posts/public${query}`);
+
     set({
       posts: data.data,
       meta: data.meta,

@@ -3,14 +3,19 @@
 import { useEffect } from "react";
 import { usePostStore } from "@/store/postStore";
 import { useAuthStore } from "@/store/authStore";
+import { useLogsStore } from "@/store/logsStore";
 import { FileText, CheckCircle2, PenTool, Plus } from "lucide-react";
 
 export default function DashboardHome() {
   const { posts, fetchPosts } = usePostStore();
   const { user } = useAuthStore();
+  const { logs, fetchLogs, loading, error } = useLogsStore();
 
   useEffect(() => {
     fetchPosts();
+    if (user?.role === "PRESIDENTE") {
+      fetchLogs({ limit: 10 });
+    }
   }, []);
 
   const total = posts?.length || 0;
@@ -65,17 +70,47 @@ export default function DashboardHome() {
         />
       </div>
 
-      {/* Seção de Conteúdo (Mock) para não ficar vazio na tela grande */}
-      <div className="bg-white border border-slate-200/60 rounded-2xl shadow-sm p-6 mt-8">
-        <h3 className="text-base font-semibold text-slate-800 mb-4">Atividade Recente</h3>
-        <div className="flex flex-col items-center justify-center py-12 text-center border-2 border-dashed border-slate-100 rounded-xl bg-slate-50/50">
-          <div className="bg-white p-3 rounded-full shadow-sm mb-3">
-            <FileText className="text-slate-400" size={24} />
+      {/* Seção de Conteúdo (Logs) — apenas para PRESIDENTE */}
+      {user?.role === "PRESIDENTE" && (
+        <div className="bg-white border border-slate-200/60 rounded-2xl shadow-sm p-6 mt-8">
+          <h3 className="text-base font-semibold text-slate-800 mb-4">Atividade Recente</h3>
+
+          <div className="rounded-xl bg-slate-50/50 p-4">
+            {loading && (
+              <div className="py-8 text-center text-sm text-slate-500">Carregando logs...</div>
+            )}
+
+            {!loading && logs.length === 0 && (
+              <div className="flex flex-col items-center justify-center py-12 text-center border-2 border-dashed border-slate-100 rounded-xl">
+                <div className="bg-white p-3 rounded-full shadow-sm mb-3">
+                  <FileText className="text-slate-400" size={24} />
+                </div>
+                <p className="text-sm font-medium text-slate-600">Nenhuma atividade recente.</p>
+                <p className="text-xs text-slate-400 mt-1">Aguarde novas entradas de log.</p>
+              </div>
+            )}
+
+            {!loading && logs.length > 0 && (
+              <ul className="space-y-3">
+                {logs.map((log: any) => (
+                  <li key={log.id} className="flex items-start gap-3 p-3 bg-white rounded-lg border">
+                    <div className="text-slate-500 text-sm w-40">
+                      {log.createdAt ? new Date(log.createdAt).toLocaleString() : "-"}
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-sm font-medium text-slate-800">{log.action || log.message || log.entityType}</div>
+                      <div className="text-xs text-slate-400">{log.message || ''}</div>
+                    </div>
+                    <div className="text-xs text-slate-400">{log.user?.nome || log.user?.id || ''}</div>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {error && <div className="text-xs text-rose-600 mt-3">{error}</div>}
           </div>
-          <p className="text-sm font-medium text-slate-600">Nenhuma atividade recente.</p>
-          <p className="text-xs text-slate-400 mt-1">Comece a escrever sua primeira matéria.</p>
         </div>
-      </div>
+      )}
 
     </div>
   );

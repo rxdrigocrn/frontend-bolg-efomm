@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type MouseEvent } from "react";
+import { useEffect, useState, type MouseEvent, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { HamburgerMenu } from "@/components/HamburguerMenu";
@@ -12,6 +12,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { usePostStore } from "@/store/postStore";
+import { useTagStore } from "@/store/tagStore";
 
 const getCoverImage = (post: { imagemUrl?: string; imagemUrls?: string[] }) => {
   const firstFromArray = Array.isArray(post.imagemUrls)
@@ -26,14 +27,23 @@ export default function Noticias() {
 
   // Pegando dados da Store
   const { posts, meta, loading, fetchPublicPosts } = usePostStore();
+  const { tags, fetchTags } = useTagStore();
 
   // Estado local para controlar a página atual
   const [currentPage, setCurrentPage] = useState(1);
+  const [query, setQuery] = useState(""); // input value
+  const [search, setSearch] = useState(""); // applied search
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
 
-  // Busca os posts sempre que a página atual mudar
+  // Busca as tags uma vez
   useEffect(() => {
-    fetchPublicPosts(currentPage, 9); // Traz 9 por página
-  }, [currentPage]);
+    fetchTags();
+  }, []);
+
+  // Busca os posts sempre que a página atual, busca ou tags mudarem
+  useEffect(() => {
+    fetchPublicPosts({ page: currentPage, limit: 9, search, tagIds: selectedTagIds });
+  }, [currentPage, search, selectedTagIds]);
 
   // Função para formatar a data (ex: 12 de Abril de 2026)
   const formatarData = (dataString: string) => {
@@ -48,6 +58,17 @@ export default function Noticias() {
   const handleNoticiaClick = (id: string) => {
     // Você pode mudar para `/noticias/${post.slug}` se preferir usar a URL amigável
     router.push(`/noticias/${id}`);
+  };
+
+  const handleSearchSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    setCurrentPage(1);
+    setSearch(query);
+  };
+
+  const toggleTag = (id: string) => {
+    setCurrentPage(1);
+    setSelectedTagIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   };
 
   const handleAutorClick = (event: MouseEvent, autorId?: string) => {
@@ -166,6 +187,52 @@ export default function Noticias() {
 </svg>
 </div>
 </section>
+
+        {/* BARRA DE BUSCA E FILTRO POR TAGS */}
+        <div className="max-w-7xl mx-auto px-6 -mt-10">
+          <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+            <form onSubmit={handleSearchSubmit} className="flex items-center gap-3">
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Buscar por título"
+                className="flex-1 px-4 py-2 border rounded-lg focus:outline-none"
+              />
+              <button
+                type="submit"
+                className="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800"
+              >
+                Buscar
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setQuery("");
+                  setSearch("");
+                  setSelectedTagIds([]);
+                  setCurrentPage(1);
+                }}
+                className="px-3 py-2 bg-slate-100 rounded-lg text-sm"
+              >
+                Limpar
+              </button>
+            </form>
+
+            {tags && tags.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {tags.map((t) => (
+                  <button
+                    key={t.id}
+                    onClick={() => toggleTag(t.id)}
+                    className={`px-3 py-1 rounded-full text-sm border ${selectedTagIds.includes(t.id) ? 'bg-blue-900 text-white border-blue-900' : 'bg-slate-50 text-slate-700 border-slate-200'}`}
+                  >
+                    {t.name}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
 
         {/* MENSAGEM DE CARREGANDO OU VAZIO */}
         {loading ? (
