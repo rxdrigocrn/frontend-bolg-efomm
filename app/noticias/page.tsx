@@ -189,7 +189,7 @@ export default function Noticias() {
 </section>
 
         {/* BARRA DE BUSCA E FILTRO POR TAGS */}
-        <div className="max-w-7xl mx-auto px-6 -mt-10">
+        <div className="max-w-7xl mx-auto px-6">
           <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
             <form onSubmit={handleSearchSubmit} className="flex items-center gap-3">
               <input

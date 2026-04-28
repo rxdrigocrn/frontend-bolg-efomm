@@ -498,7 +498,7 @@ const [showToast, setShowToast] = useState(false);
 
                   <span className="text-sm font-semibold text-slate-500 mr-2">
                     Compartilhar:
-                  </span>
+                  </span>cd
                   <button
                     className={`h-10 w-10 rounded-full border flex items-center justify-center transition-all ${
                       copied
