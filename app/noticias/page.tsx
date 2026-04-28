@@ -264,28 +264,7 @@ export default function Noticias() {
               )}
             </form>
 
-            {/* Tags disponíveis como botões para seleção rápida */}
-            {tags && tags.length > 0 && (
-              <div className="mt-4 pt-4 border-t border-slate-100">
-                <p className="text-xs font-semibold text-slate-500 mb-3">Ou selecione por categoria:</p>
-                <div className="flex flex-wrap gap-2">
-                  {tags.map((t) => (
-                    <button
-                      key={t.id}
-                      onClick={() => toggleTag(t.id)}
-                      type="button"
-                      className={`px-4 py-2 rounded-full text-sm font-medium border-2 transition-all duration-200 ${
-                        selectedTagIds.includes(t.id)
-                          ? 'bg-blue-900 text-white border-blue-900 shadow-md'
-                          : 'bg-white text-slate-700 border-slate-200 hover:border-blue-900 hover:text-blue-900'
-                      }`}
-                    >
-                      {t.name}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
+           
           </div>
         </div>
 
