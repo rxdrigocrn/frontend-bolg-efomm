@@ -348,7 +348,7 @@ function PostModal({
           imageUrls.forEach((url) => formData.append("imagemUrls", url));
         }
 
-        form.tagIds.forEach((tagId) => formData.append("tags", tagId));
+        form.tagIds.forEach((tagId) => formData.append("tagIds", tagId));
         dataToSubmit = formData;
       } else {
         const imageUrls = parseImageUrls(form.imagemUrlsText);
@@ -357,7 +357,7 @@ function PostModal({
           titulo: form.titulo,
           conteudo: form.conteudo,
           publicado: form.publicado,
-          tags: form.tagIds,
+          tagIds: form.tagIds,
           ...(imageUrls.length
             ? { imagemUrls: imageUrls, imagemUrl: imageUrls[0] }
             : {}),

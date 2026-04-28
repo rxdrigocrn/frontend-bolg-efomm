@@ -208,7 +208,7 @@ export default function Noticias() {
                     setCurrentPage(1);
                     setSelectedTagIds(values);
                   }}
-                  className="px-3 py-2 border rounded-lg bg-white text-sm max-h-36 overflow-auto"
+                  className="px-3 py-2 border border-slate-200 rounded-xl bg-white text-sm max-h-36 overflow-auto shadow-sm min-w-[180px] focus:outline-none focus:ring-2 focus:ring-blue-200"
                   aria-label="Filtrar por tags"
                 >
                   {tags.map((t) => (
