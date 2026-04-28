@@ -198,6 +198,26 @@ export default function Noticias() {
                 placeholder="Buscar por título"
                 className="flex-1 px-4 py-2 border rounded-lg focus:outline-none"
               />
+              {/* Select múltiplo para filtrar por tags (adicionado) */}
+              {tags && tags.length > 0 && (
+                <select
+                  multiple
+                  value={selectedTagIds}
+                  onChange={(e) => {
+                    const values = Array.from(e.target.selectedOptions).map((o) => o.value);
+                    setCurrentPage(1);
+                    setSelectedTagIds(values);
+                  }}
+                  className="px-3 py-2 border rounded-lg bg-white text-sm max-h-36 overflow-auto"
+                  aria-label="Filtrar por tags"
+                >
+                  {tags.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.name}
+                    </option>
+                  ))}
+                </select>
+              )}
               <button
                 type="submit"
                 className="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800"
