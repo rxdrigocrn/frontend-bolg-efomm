@@ -6,8 +6,9 @@ type Log = {
   entityType?: string;
   action?: string;
   message?: string;
+  summary?: string;
   createdAt?: string;
-  user?: { id?: string; nome?: string; role?: string };
+  user?: { id?: string; nome?: string; role?: string; email?: string };
 };
 
 type LogsState = {
@@ -33,10 +34,18 @@ export const useLogsStore = create<LogsState>((set) => ({
       if (limit) params.set("limit", String(limit));
 
       const query = params.toString() ? `?${params.toString()}` : "";
-      const data = await apiFetch(`/logs${query}`);
+      const data = await apiFetch(`/management/logs${query}`);
 
-      // assume API returns array of logs
-      set({ logs: Array.isArray(data) ? data : [], loading: false });
+      const normalizedLogs = Array.isArray(data)
+        ? data.map((log: any) => ({
+            ...log,
+            message: log.message ?? log.summary ?? "",
+            summary: log.summary ?? log.message ?? "",
+            user: log.user ?? log.actor ?? null,
+          }))
+        : [];
+
+      set({ logs: normalizedLogs, loading: false });
     } catch (err) {
       const message = err instanceof Error ? err.message : "Erro ao buscar logs";
       set({ error: message, loading: false });
