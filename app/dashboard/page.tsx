@@ -91,20 +91,42 @@ export default function DashboardHome() {
             )}
 
             {!loading && logs.length > 0 && (
-              <ul className="space-y-3">
-                {logs.map((log: any) => (
-                  <li key={log.id} className="flex items-start gap-3 p-3 bg-white rounded-lg border">
-                    <div className="text-slate-500 text-sm w-40">
-                      {log.createdAt ? new Date(log.createdAt).toLocaleString() : "-"}
-                    </div>
-                    <div className="flex-1">
-                      <div className="text-sm font-medium text-slate-800">{log.action || log.message || log.entityType}</div>
-                      <div className="text-xs text-slate-400">{log.message || ''}</div>
-                    </div>
-                    <div className="text-xs text-slate-400">{log.user?.nome || log.user?.id || ''}</div>
-                  </li>
-                ))}
-              </ul>
+              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-slate-200 text-left">
+                    <thead className="bg-slate-50">
+                      <tr>
+                        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Data</th>
+                        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Ação</th>
+                        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Entidade</th>
+                        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Mensagem</th>
+                        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Autor</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {logs.map((log: any) => (
+                        <tr key={log.id} className="hover:bg-slate-50/70 transition-colors">
+                          <td className="px-4 py-3 text-sm text-slate-600 whitespace-nowrap">
+                            {log.createdAt ? new Date(log.createdAt).toLocaleString() : "-"}
+                          </td>
+                          <td className="px-4 py-3 text-sm font-medium text-slate-800">
+                            {log.action || "-"}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-slate-600">
+                            {log.entityType || "-"}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-slate-600">
+                            {log.summary || log.message || "-"}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-slate-600 whitespace-nowrap">
+                            {log.user?.nome || log.user?.email || log.user?.id || "-"}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             )}
 
             {error && <div className="text-xs text-rose-600 mt-3">{error}</div>}
