@@ -99,6 +99,25 @@ export default function PostsPage() {
                   >
                     <td className="px-6 py-4 font-medium text-slate-900 max-w-[300px] truncate">
                       {post.titulo}
+
+                      <div className="mt-3 flex items-center gap-2 sm:hidden">
+                        <button
+                          onClick={() => handleOpenEdit(post)}
+                          className="inline-flex items-center gap-2 rounded-lg bg-blue-50 px-3 py-2 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100"
+                          title="Editar"
+                        >
+                          <Pencil size={14} />
+                          Editar
+                        </button>
+                        <button
+                          onClick={() => setPostToDelete(post.id)}
+                          className="inline-flex items-center gap-2 rounded-lg bg-red-50 px-3 py-2 text-xs font-medium text-red-700 transition-colors hover:bg-red-100"
+                          title="Excluir"
+                        >
+                          <Trash2 size={14} />
+                          Excluir
+                        </button>
+                      </div>
                     </td>
 
                     <td className="px-6 py-4">
@@ -145,7 +164,7 @@ export default function PostsPage() {
                       )}
                     </td>
 
-                    <td className="px-6 py-4 text-right">
+                    <td className="hidden px-6 py-4 text-right sm:table-cell">
                       <div className="flex items-center justify-end gap-2 sm:opacity-50 sm:group-hover:opacity-100 opacity-100 transition-opacity">
                         <button
                           onClick={() => handleOpenEdit(post)}
